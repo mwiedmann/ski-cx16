@@ -1,6 +1,7 @@
 #include <cx16.h>
 #include <cbm.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "config.h"
 #include "course.h"
@@ -41,11 +42,22 @@ void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     *l1Tile = VERA.data0;
 }
 
+void showTimer(unsigned char mins, unsigned char secs, unsigned char milli) {
+    unsigned char msg[24], buf[24];
+
+    sprintf(buf, "%u:%02u.%02u", mins, secs, milli);
+    sprintf(msg, "%12s", buf);
+
+    spriteText(msg, 0);
+}
+
 void main() {
     unsigned char l0Tile;
     unsigned char l1Tile;
     unsigned char inSnow = 0;
     unsigned short scrollSpeed;
+    unsigned char mins, secs, ticks, milli;
+    
 
     init();
     
@@ -59,6 +71,12 @@ void main() {
         VERA.layer1.vscroll = scroll;
 
         waitCount(120);
+
+        ticks = 0;
+        mins = 0;
+        secs = 0;
+
+        showTimer(mins, secs, milli);
 
         while(1) {
             getCollisionTiles(&l0Tile, &l1Tile);
@@ -91,6 +109,33 @@ void main() {
             VERA.layer0.vscroll = scroll;
             VERA.layer1.vscroll = scroll;
 
+            // Timer
+            ticks++;
+            
+            if (ticks == 60) {
+                ticks = 0;
+                secs++;
+                if (secs == 60) {
+                    secs = 0;
+                    mins++;
+                }
+            }
+
+            if (ticks == 15) {
+                milli = 25;
+                showTimer(mins, secs, milli);
+            } else if (ticks == 30) {
+                milli = 50;
+                showTimer(mins, secs, milli);
+            } else if (ticks == 45) {
+                milli = 75;
+                showTimer(mins, secs, milli);
+            } else if (ticks == 0) {
+                milli = 0;
+                showTimer(mins, secs, milli);
+            }
+
+            
             wait();
         }
     }
