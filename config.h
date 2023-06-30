@@ -1,0 +1,23 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#define MAPBASE_TILE_WIDTH 64
+#define MAPBASE_TILE_HEIGHT 256
+#define MAPBASE_TILE_COUNT MAPBASE_TILE_WIDTH * MAPBASE_TILE_HEIGHT
+#define MAPBASE_SIZE MAPBASE_TILE_COUNT*2
+
+#define TILE_CHARS_START 85
+#define TILESET_SIZE 37120L // (12w * 12h * 16x16pixels) + 1 empty 16x16 tile
+
+// Our default Tile and Map Base addresses
+#define L0_MAPBASE_ADDR 0x00000L
+#define L1_MAPBASE_ADDR L0_MAPBASE_ADDR + MAPBASE_SIZE 
+#define TILEBASE_ADDR L1_MAPBASE_ADDR + MAPBASE_SIZE
+
+#define PALETTE_ADDR 0x1FA00L
+
+#define FLAGS_BANK 1
+
+void init();
+
+#endif
