@@ -32,7 +32,7 @@ void loadFileToVRAM(unsigned char *filename, unsigned long addr) {
     cbm_k_load(addr > 0xFFFFL ? 3 : 2, addr);
 }
 
-void loadFileToBankedRAM(unsigned char *filename, unsigned char bank) {
+void loadFileToBankedRAM(unsigned char *filename, unsigned char bank, unsigned short addr) {
     // Set the RAM Bank we are loading into
     BANK_NUM = bank;
 
@@ -45,7 +45,38 @@ void loadFileToBankedRAM(unsigned char *filename, unsigned char bank) {
 
     // BANK_RAM is a #define provided by cx16.h
     // as a pointer to 0xA000 (which is where Bank RAM starts)
-    cbm_k_load(0, (unsigned short)BANK_RAM);
+    cbm_k_load(0, (unsigned short)BANK_RAM + addr);
+}
+
+void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, unsigned long length) {
+    unsigned long remaining;
+    unsigned short i;
+
+    VERA.address = vramAddr;
+    VERA.address_hi = vramAddr>>16;
+    // Set the Increment Mode, turn on bit 4
+    VERA.address_hi |= 0b10000;
+
+    // This crazy routine uses the kernal memory_copy function to bulk copy RAM to VRAM
+    // I had to increment the bank and do it in chunks though.
+    for (i=0; i<length/8192+1; i++) {
+        // Set the RAM Bank we are reading from
+        BANK_NUM = startMemBank+i;
+
+         // Virtual Registers for the Kernal Function
+        R0 = (unsigned short)BANK_RAM; // Read from the Banked RAM starting Address 0xA000
+        R1 = 0x9F23; // Write to the VERA.data0 memory location
+
+        remaining = length - (8192*i);
+        if (remaining < 8192) {
+            R2 = remaining;
+        } else {
+            R2 = 8192;
+        }
+
+        // Call the memory_copy Kernal Function
+        __asm__("jsr $FEE7");
+    }
 }
 
 void message(unsigned char* msg, unsigned char row, unsigned char col) {
