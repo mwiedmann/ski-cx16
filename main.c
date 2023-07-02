@@ -79,6 +79,7 @@ void main() {
         ticks = 0;
         mins = 0;
         secs = 0;
+        milli = 0;
 
         showTimer(mins, secs, milli);
 

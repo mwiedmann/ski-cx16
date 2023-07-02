@@ -14,3 +14,8 @@ gimp:
 
 zip:
 	zip ski.zip SKI.PRG C0L0.BIN C0L1.BIN C0FLAGS.BIN SKITILES.BIN SKITILES.PAL manifest.json
+
+all:
+	make ldtk
+	make gimp
+	make
