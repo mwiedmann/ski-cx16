@@ -11,7 +11,7 @@
 
 GuyData guyData;
 
-short scroll = 0, previousScroll = 0;
+short scroll = 0, previousScroll = 0, scrollX = 0;
 unsigned char lastTileX = 0, lastTileY = 0;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
@@ -85,6 +85,17 @@ void main() {
 
         // Load the top half of the starting course
         drawPartialCourse(course, 0);
+
+        scrollX = guyData.guyX - 160;
+
+        move(&guyData, scrollX, &scrollSpeed, inSnow);
+        // timerSpritesMove(scrollX);
+
+        VERA.layer0.vscroll = scroll;
+        VERA.layer1.vscroll = scroll;
+        VERA.layer0.hscroll = scrollX;
+        VERA.layer1.hscroll = scrollX;
+        
         message("GET", 6, 33);
         message("READY!", 7, 33);
         waitCount(120);
@@ -111,7 +122,7 @@ void main() {
                 inSnow = 0;
             }
 
-            move(&guyData, &scrollSpeed, inSnow);
+            move(&guyData, scrollX, &scrollSpeed, inSnow);
 
             // Dead if off screen
             if (guyData.guyX > 640) {
@@ -139,9 +150,18 @@ void main() {
 
             previousScroll = scroll;
 
+            scrollX = guyData.guyX - 160;
 
+            if (scrollX < 0) {
+                scrollX = 0;
+            } else if (scrollX > 320) {
+                scrollX = 320;
+            }
+            
             VERA.layer0.vscroll = scroll;
             VERA.layer1.vscroll = scroll;
+            VERA.layer0.hscroll = scrollX;
+            VERA.layer1.hscroll = scrollX;
 
             // Timer
             ticks++;

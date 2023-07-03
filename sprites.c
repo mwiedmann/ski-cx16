@@ -82,7 +82,7 @@ void spritesConfig(GuyData *guyData) {
     // VRAM address for sprite 1 (this is fixed)
     unsigned long spriteGraphicAddress = TILEBASE_ADDR + (72 * 256);
     guyData->guyX = 480;
-    guyData->guyY = 40;
+    guyData->guyY = 16;
     guyData->guyMoveX = 0;
     guyData->guyMoveY = 0;
 
@@ -108,7 +108,7 @@ void spritesConfig(GuyData *guyData) {
     timerSprites();
 }
 
-void move(GuyData *guyData, unsigned short *scrollSpeed, unsigned char inSnow) {
+void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow) {
     unsigned char joy;
     unsigned short scrollInc = 0, scrollMax;
     short moveMax;
@@ -173,8 +173,8 @@ void move(GuyData *guyData, unsigned short *scrollSpeed, unsigned char inSnow) {
     VERA.address_hi |= 0b10000;
     
     // Set the X and Y values
-    VERA.data0 = guyData->guyX;
-    VERA.data0 = guyData->guyX>>8;
+    VERA.data0 = guyData->guyX-scrollX;
+    VERA.data0 = (guyData->guyX-scrollX)>>8;
     VERA.data0 = guyData->guyY;
     VERA.data0 = guyData->guyY>>8;
 }

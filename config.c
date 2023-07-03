@@ -34,8 +34,8 @@ void init() {
     VERA.layer1.tilebase = TILEBASE_ADDR>>9 | 0b11;
 
     // Scale up our 16x16 game to 32x32
-    //VERA.display.hscale = 64;
-    //VERA.display.vscale = 64;
+    VERA.display.hscale = 64;
+    VERA.display.vscale = 64;
 
     loadFileToVRAM(palFilename, PALETTE_ADDR);
     loadFileToVRAM(tileFilename, TILEBASE_ADDR);
