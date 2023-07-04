@@ -65,8 +65,8 @@ void timerSprites(unsigned char zoomMode, unsigned char show) {
             VERA.data0 = TILESET_DIGITS_ADDR>>5;
             // 256 color mode, and graphic address bits 16:13
             VERA.data0 = 0b10000000 | TILESET_DIGITS_ADDR>>13;
-            VERA.data0 = zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640 + (x*16);
-            VERA.data0 = (zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640 + (x*16))>>8;
+            VERA.data0 = (zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640) + (x*16);
+            VERA.data0 = ((zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640) + (x*16))>>8;
             VERA.data0 = SPRITE_TEXT_Y + (y*16);
             VERA.data0 = (SPRITE_TEXT_Y + (y*16))>>8;
             VERA.data0 = show ? 0b00001100 : 0; // Z-Depth=3 (or 0 to hide)
