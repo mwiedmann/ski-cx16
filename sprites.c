@@ -48,7 +48,7 @@ void spriteText(unsigned char* msg, unsigned char row) {
     }
 }
 
-void timerSprites() {
+void timerSprites(unsigned char zoomMode, unsigned char show) {
     unsigned char x, y;
 
     // Point to Sprite 2
@@ -65,11 +65,11 @@ void timerSprites() {
             VERA.data0 = TILESET_DIGITS_ADDR>>5;
             // 256 color mode, and graphic address bits 16:13
             VERA.data0 = 0b10000000 | TILESET_DIGITS_ADDR>>13;
-            VERA.data0 = SPRITE_TEXT_X + (x*16);
-            VERA.data0 = (SPRITE_TEXT_X + (x*16))>>8;
+            VERA.data0 = zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640 + (x*16);
+            VERA.data0 = (zoomMode == 0 ? SPRITE_TEXT_X_320 : SPRITE_TEXT_X_640 + (x*16))>>8;
             VERA.data0 = SPRITE_TEXT_Y + (y*16);
             VERA.data0 = (SPRITE_TEXT_Y + (y*16))>>8;
-            VERA.data0 = 0b00001100; // Z-Depth=3
+            VERA.data0 = show ? 0b00001100 : 0; // Z-Depth=3 (or 0 to hide)
             VERA.data0 = 0b01010000; // 16x16 pixel image
         }
     }
@@ -78,11 +78,11 @@ void timerSprites() {
     spriteText("            ", 1);
 }
 
-void spritesConfig(GuyData *guyData) {
+void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show) {
     // VRAM address for sprite 1 (this is fixed)
     unsigned long spriteGraphicAddress = TILEBASE_ADDR + (72 * 256);
     guyData->guyX = 480;
-    guyData->guyY = 40;
+    guyData->guyY = 16;
     guyData->guyMoveX = 0;
     guyData->guyMoveY = 0;
 
@@ -102,13 +102,13 @@ void spritesConfig(GuyData *guyData) {
     VERA.data0 = guyData->guyX>>8;
     VERA.data0 = guyData->guyY;
     VERA.data0 = guyData->guyY>>8;
-    VERA.data0 = 0b00001000; // Z-Depth=2
+    VERA.data0 = show ? 0b00001000 : 0; // Z-Depth=2 (or 0 to hide)
     VERA.data0 = 0b01010000; // 16x16 pixel image
 
-    timerSprites();
+    timerSprites(zoomMode, show);
 }
 
-void move(GuyData *guyData, unsigned short *scrollSpeed, unsigned char inSnow) {
+void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow) {
     unsigned char joy;
     unsigned short scrollInc = 0, scrollMax;
     short moveMax;
@@ -152,12 +152,21 @@ void move(GuyData *guyData, unsigned short *scrollSpeed, unsigned char inSnow) {
     }
 
     if (JOY_LEFT(joy)) {
-        guyData->guyMoveX-= inSnow ? 1 : 2;
+        if (guyData->guyMoveX > 0) {
+            guyData->guyMoveX-= inSnow ? 1 : 3;
+        } else {
+            guyData->guyMoveX-= inSnow ? 1 : 2;
+        }
+        
         if (guyData->guyMoveX < -moveMax) {
             guyData->guyMoveX = -moveMax;
         }
     } else if (JOY_RIGHT(joy)) {
-        guyData->guyMoveX+= inSnow ? 1 : 2;
+        if (guyData->guyMoveX < 0) {
+            guyData->guyMoveX+= inSnow ? 1 : 3;
+        } else {
+            guyData->guyMoveX+= inSnow ? 1 : 2;
+        }
         if (guyData->guyMoveX > moveMax) {
             guyData->guyMoveX = moveMax;
         }
@@ -173,8 +182,8 @@ void move(GuyData *guyData, unsigned short *scrollSpeed, unsigned char inSnow) {
     VERA.address_hi |= 0b10000;
     
     // Set the X and Y values
-    VERA.data0 = guyData->guyX;
-    VERA.data0 = guyData->guyX>>8;
+    VERA.data0 = guyData->guyX-scrollX;
+    VERA.data0 = (guyData->guyX-scrollX)>>8;
     VERA.data0 = guyData->guyY;
     VERA.data0 = guyData->guyY>>8;
 }

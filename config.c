@@ -5,8 +5,6 @@
 #include "utils.h"
 
 void init() {
-    // Note we need a `short` here because there are more than 255 tiles
-    unsigned short i;
     unsigned char *tileFilename = "tilemap.bin";
     unsigned char *palFilename = "tilemap.pal";
 
@@ -33,14 +31,20 @@ void init() {
     VERA.layer0.tilebase = TILEBASE_ADDR>>9 | 0b11;
     VERA.layer1.tilebase = TILEBASE_ADDR>>9 | 0b11;
 
-    // Scale up our 16x16 game to 32x32
-    //VERA.display.hscale = 64;
-    //VERA.display.vscale = 64;
-
     loadFileToVRAM(palFilename, PALETTE_ADDR);
     loadFileToVRAM(tileFilename, TILEBASE_ADDR);
-   
-    // Clear both layers
+}
+
+void setZoom(unsigned char zoomMode) {
+    VERA.display.hscale = zoomMode == 0 ? 64 : 128;
+    VERA.display.vscale = zoomMode == 0 ? 64 : 128;
+}
+
+void clearLayer0() {
+    // Note we need a `short` here because there are more than 255 tiles
+    unsigned short i;
+    
+    // Clear layer 0
     VERA.address = L0_MAPBASE_ADDR;
     VERA.address_hi = L0_MAPBASE_ADDR>>16;
     // Always set the Increment Mode, turn on bit 4
@@ -51,8 +55,13 @@ void init() {
         VERA.data0 = 0;
         VERA.data0 = 0;
     }
+}
 
-    // Just clear layer 1 for now
+void clearLayer1() {
+    // Note we need a `short` here because there are more than 255 tiles
+    unsigned short i;
+
+    // Clear layer 1
     VERA.address = L1_MAPBASE_ADDR;
     VERA.address_hi = L1_MAPBASE_ADDR>>16;
     // Always set the Increment Mode, turn on bit 4
@@ -63,4 +72,9 @@ void init() {
         VERA.data0 = 0;
         VERA.data0 = 0;
     }
+}
+
+void clearLayers() {
+    clearLayer0();
+    clearLayer1();
 }
