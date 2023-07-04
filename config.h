@@ -29,5 +29,9 @@
 #define C1_L1_BANK C1_L0_BANK + COURSE_LAYER_BANK_SIZE
 
 void init();
+void setZoom(unsigned char zoomMode);
+void clearLayers();
+void clearLayer0();
+void clearLayer1();
 
 #endif

@@ -79,9 +79,9 @@ void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, uns
     }
 }
 
-void message(unsigned char* msg, unsigned char row, unsigned char col) {
+void message(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY) {
     unsigned short i, tile;
-    unsigned long addr = L1_MAPBASE_ADDR + (row * MAPBASE_TILE_WIDTH * 2) + (col * 2);
+    unsigned long addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2) + (((scrollX>>4) + col) * 2);
 
     // Draw the tileset to layer 0
     VERA.address = addr;
@@ -124,12 +124,12 @@ void message(unsigned char* msg, unsigned char row, unsigned char col) {
     }
 }
 
-void messageCenter(unsigned char* msg, unsigned char row) {
+void messageCenter(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode) {
     unsigned char len, col;
-    
+    unsigned char offset = zoomMode == 1 ? 41 : 21;
     len = strlen(msg);
 
-    col = (40 - len) / 2;
+    col = (offset - len)>>1;
 
-    message(msg, row, col);
+    message(msg, zoomMode == 0 ? row0 : row1, col, scrollX, scrollY);
 }

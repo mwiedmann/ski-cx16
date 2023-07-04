@@ -3,10 +3,11 @@
 
 #define SPRITE1_ADDR 0x1FC08
 #define SPRITE_TEXT_ADDR 0x1FC10
-#define GUY_MOVE_X_MAX 64
+#define GUY_MOVE_X_MAX 48
 #define GUY_MOVE_X_SNOW_MAX 32
 
-#define SPRITE_TEXT_X 128
+#define SPRITE_TEXT_X_320 128
+#define SPRITE_TEXT_X_640 448
 #define SPRITE_TEXT_Y 0
 #define SPRITE_TEXT_COUNT 12
 
@@ -17,7 +18,7 @@ typedef struct GuyData {
     short guyMoveY;
 } GuyData;
 
-void spritesConfig(GuyData *guyData);
+void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show);
 void spriteText(unsigned char* msg, unsigned char row);
 void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow);
 
