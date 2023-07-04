@@ -2,7 +2,7 @@
 #define COURSE_H
 
 void loadCourses();
-void drawPartialCourse(unsigned char course, unsigned char half);
+void drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags);
 
 #define COURSE_COUNT 2
 

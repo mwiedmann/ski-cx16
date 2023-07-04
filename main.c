@@ -13,7 +13,7 @@
 GuyData guyData;
 
 short scrollY = 0, previousScroll = 0, scrollX = 0;
-unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 1;
+unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 0;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     unsigned char tileX, tileY;
@@ -66,8 +66,6 @@ void showTitle() {
 void pickMode() {
     unsigned char joy;
 
-    zoomMode = 0;
-
     clearLayers();
     
     // Requires 640 mode
@@ -88,15 +86,15 @@ void pickMode() {
             waitCount(15);
         }
 
-        if (JOY_BTN_1(joy)) {
+        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
             break;
         }
 
-        messageCenter(zoomMode == 0 ? "::320*240::" : "  320*240  ", 7, 14, scrollX, scrollY, 1);
+        messageCenter(zoomMode == 0 ? "::320X240::" : "  320X240  ", 7, 14, scrollX, scrollY, 1);
         messageCenter("ZOOMED IN ACTION FEEL", 8, 15, scrollX, scrollY, 1);
         
-        messageCenter(zoomMode == 1 ? "::640*480::" : "  640*480  ", 10, 17, scrollX, scrollY, 1);
-        messageCenter("WIDER FIELD OF VIEW", 11, 18, scrollX, scrollY, 1);
+        messageCenter(zoomMode == 1 ? "::640X480::" : "  640X480  ", 10, 17, scrollX, scrollY, 1);
+        messageCenter("BIGGER FIELD OF VIEW", 11, 18, scrollX, scrollY, 1);
 
         wait();
     }
@@ -105,21 +103,26 @@ void pickMode() {
 void main() {
     unsigned char l0Tile;
     unsigned char l1Tile;
-    unsigned char inSnow = 0;
+    unsigned char inSnow;
     unsigned short scrollSpeed, scrollLimit, halfScrollLimit;
     unsigned char mins, secs, ticks, milli;
-    unsigned char course = 0;
+    unsigned char course;
+    unsigned runsUntilFinish;
 
     init();
     showTitle();
 
     loadCourses();
-    // waitCount(120);
+    waitCount(120);
   
     while(1) {
         spritesConfig(&guyData, 0, 0); // hide sprites
         pickMode();
         setZoom(zoomMode);
+
+        course = 0; // Starting course
+        runsUntilFinish = 4; // How many courses until the finish line
+        inSnow = 0;
 
         scrollLimit = zoomMode == 0 ? 320 : 0;
         halfScrollLimit = zoomMode == 0 ? 160 : 0;
@@ -143,7 +146,7 @@ void main() {
         showTimer(mins, secs, milli);
 
         // Load the top half of the starting course
-        drawPartialCourse(course, 0);
+        drawPartialCourse(course, 0, 1);
 
         move(&guyData, scrollX, &scrollSpeed, inSnow);
         
@@ -170,7 +173,7 @@ void main() {
 
             // Check for collision with tree bases/stumps/bushes/poles
             if (l1Tile) {
-                if (l1Tile == 19 || l1Tile == 20 || l1Tile == 31 || l1Tile == 32 || l1Tile == 48 || l1Tile == 67) {
+                if (l1Tile == 11 || l1Tile == 12 || l1Tile == 19 || l1Tile == 20 || l1Tile == 31 || l1Tile == 32 || l1Tile == 48 || l1Tile == 67 || l1Tile == 82) {
                     messageCenter("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode);
                     waitCount(180);
                     course = 0;
@@ -200,15 +203,33 @@ void main() {
                 scrollY = scrollY - 4095;
             }
 
+            // See if finished
+            if (course == 15 && scrollY >= 150 && scrollY < 200) {
+                if (guyData.guyX<240 || guyData.guyX > 400) {
+                    messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
+                } else {
+                    messageCenter("FINISHED!!!", 7, 15, scrollX, scrollY, zoomMode);
+                }
+                waitCount(180);
+                break;
+            }
+
             // See if we hit any breakpoints where we need to load more course data
             if (scrollY >= 1024 && previousScroll < 1024) {
-                drawPartialCourse(course, 1);
+                drawPartialCourse(course, 1, 1);
             } else if (scrollY >= 3072 && previousScroll < 3072) {
-                course++;
-                if (course == COURSE_COUNT) {
-                    course = 0;
+                runsUntilFinish--;
+                if (runsUntilFinish == 0) {
+                    course = 15;
+                    drawPartialCourse(course, 0, 0);
+                } else {
+                    course++;
+                    if (course == COURSE_COUNT) {
+                        course = 0;
+                    }
+                    drawPartialCourse(course, 0, 1);
                 }
-                drawPartialCourse(course, 0);
+                
             }
 
             previousScroll = scrollY;

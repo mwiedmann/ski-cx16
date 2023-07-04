@@ -12,9 +12,12 @@ void loadCourses() {
     loadFileToBankedRAM("c1l0.bin", C1_L0_BANK, 0);
     loadFileToBankedRAM("c1l1.bin", C1_L1_BANK, 0);
     loadFileToBankedRAM("c1flags.bin", FLAGS_BANK, FLAG_BANK_SIZE);
+
+    loadFileToBankedRAM("c15l0.bin", CFINISH_L0_BANK, 0);
+    loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
 }
 
-void drawFlags(unsigned char course, unsigned char half) {
+void drawCourseFlags(unsigned char course, unsigned char half) {
     unsigned char len, i;
     unsigned long addr;
     unsigned short bankAddr;
@@ -42,7 +45,7 @@ void drawFlags(unsigned char course, unsigned char half) {
     }
 }
 
-void drawPartialCourse(unsigned char course, unsigned char half) {
+void drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags) {
     unsigned char l0bank, l1bank;
 
     switch(course) {
@@ -54,6 +57,11 @@ void drawPartialCourse(unsigned char course, unsigned char half) {
             l0bank = C1_L0_BANK;
             l1bank = C1_L1_BANK;
             break;
+
+        case 15 :
+            l0bank = CFINISH_L0_BANK;
+            l1bank = CFINISH_L1_BANK;
+            break;
     }
 
     l0bank+= half * COURSE_LAYER_HALF_BANK_SIZE;
@@ -62,5 +70,7 @@ void drawPartialCourse(unsigned char course, unsigned char half) {
     copyBankedRAMToVRAM(l0bank, L0_MAPBASE_ADDR + (half*MAPBASE_TILE_COUNT), MAPBASE_TILE_COUNT);
     copyBankedRAMToVRAM(l1bank, L1_MAPBASE_ADDR + (half*MAPBASE_TILE_COUNT), MAPBASE_TILE_COUNT);
 
-    drawFlags(course, half);
+    if (drawFlags) {
+        drawCourseFlags(course, half);
+    }
 }

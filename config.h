@@ -28,6 +28,9 @@
 #define C1_L0_BANK C0_L1_BANK + COURSE_LAYER_BANK_SIZE
 #define C1_L1_BANK C1_L0_BANK + COURSE_LAYER_BANK_SIZE
 
+#define CFINISH_L0_BANK 32 + COURSE_LAYER_BANK_SIZE
+#define CFINISH_L1_BANK CFINISH_L0_BANK + COURSE_LAYER_BANK_SIZE
+
 void init();
 void setZoom(unsigned char zoomMode);
 void clearLayers();
