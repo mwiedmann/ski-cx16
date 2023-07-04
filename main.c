@@ -63,41 +63,35 @@ void showTitle() {
     messageCenter("LOADING COURSES...", 9, 16, scrollX, scrollY, 1);
 }
 
-void pickMode() {
-    unsigned char joy;
+void setScroll() {
+    VERA.layer0.vscroll = scrollY;
+    VERA.layer1.vscroll = scrollY;
+    VERA.layer0.hscroll = scrollX;
+    VERA.layer1.hscroll = scrollX;
+}
 
-    clearLayers();
-    
-    // Requires 640 mode
-    setZoom(1);
-
-    messageCenter("CHOOSE GRAPHICS MODE", 5, 11, scrollX, scrollY, 1);
-    messageCenter("USE JOYSTICK TO SELECT", 6, 12, scrollX, scrollY, 1);
-
-    while (1) {
-        joy = joy_read(0);
-
-        if (JOY_UP(joy) || JOY_DOWN(joy)) {
-            zoomMode++;
-            if (zoomMode == 2) {
-                zoomMode = 0;
-            }
-
-            waitCount(15);
-        }
-
-        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-            break;
-        }
-
-        messageCenter(zoomMode == 0 ? "::320X240::" : "  320X240  ", 7, 14, scrollX, scrollY, 1);
-        messageCenter("ZOOMED IN ACTION FEEL", 8, 15, scrollX, scrollY, 1);
-        
-        messageCenter(zoomMode == 1 ? "::640X480::" : "  640X480  ", 10, 17, scrollX, scrollY, 1);
-        messageCenter("BIGGER FIELD OF VIEW", 11, 18, scrollX, scrollY, 1);
-
-        wait();
+void startingMessage(unsigned char zoomMode) {
+    if (zoomMode == 0) {
+        message("GET", 6, 13, scrollX, scrollY);
+        message("READY!", 7, 13, scrollX, scrollY);
+    } else {
+        message("GET", 6, 33, scrollX, scrollY);
+        message("READY!", 7, 33, scrollX, scrollY);
     }
+
+    waitCount(120);
+
+    if (zoomMode == 0) {
+        message("GO!!!", 6, 13, scrollX, scrollY);
+        message("      ", 7, 13, scrollX, scrollY);
+    } else {
+        message("GO!!!", 6, 33, scrollX, scrollY);
+        message("      ", 7, 33, scrollX, scrollY);
+    } 
+}
+
+void finialTimerUpdate(unsigned char ticks, unsigned char *milli) {
+    *milli = (ticks*100)/60;
 }
 
 void main() {
@@ -116,64 +110,58 @@ void main() {
     waitCount(120);
   
     while(1) {
+        // Reset scrolling
+        scrollY = 0;
+        scrollX = 0;
+        setScroll();
+
         spritesConfig(&guyData, 0, 0); // hide sprites
-        pickMode();
+
+        // Pick the graphics mode and set the zoom level accordingly
+        pickMode(&zoomMode);
         setZoom(zoomMode);
 
         course = 0; // Starting course
         runsUntilFinish = 4; // How many courses until the finish line
         inSnow = 0;
 
+        // Set scroll limits for the lo-res (320x240) graphics mode
         scrollLimit = zoomMode == 0 ? 320 : 0;
         halfScrollLimit = zoomMode == 0 ? 160 : 0;
 
         spritesConfig(&guyData, zoomMode, 1); // Show the sprites
 
-        scrollY = 0;
+        // Set the inital scroll position based on the starting position of the guy
         scrollX = zoomMode == 0 ? guyData.guyX - halfScrollLimit : 0;
         scrollSpeed = 0;
+        setScroll();
 
-        VERA.layer0.vscroll = scrollY;
-        VERA.layer1.vscroll = scrollY;
-        VERA.layer0.hscroll = scrollX;
-        VERA.layer1.hscroll = scrollX;
-
+        // Reset the timer
         ticks = 0;
         mins = 0;
         secs = 0;
         milli = 0;
-
         showTimer(mins, secs, milli);
 
         // Load the top half of the starting course
         drawPartialCourse(course, 0, 1);
 
+        // Move the player into positon
         move(&guyData, scrollX, &scrollSpeed, inSnow);
         
-        if (zoomMode == 0) {
-            message("GET", 6, 13, scrollX, scrollY);
-            message("READY!", 7, 13, scrollX, scrollY);
-        } else {
-            message("GET", 6, 33, scrollX, scrollY);
-            message("READY!", 7, 33, scrollX, scrollY);
-        }
+        // Show the GET READY...GO...
+        startingMessage(zoomMode);
 
-        waitCount(120);
-
-        if (zoomMode == 0) {
-            message("GO!!!", 6, 13, scrollX, scrollY);
-            message("      ", 7, 13, scrollX, scrollY);
-        } else {
-            message("GO!!!", 6, 33, scrollX, scrollY);
-            message("      ", 7, 33, scrollX, scrollY);
-        } 
-
+        // Main game loop
         while(1) {
+            // Get the tiles on each layer the guy is currently touching
             getCollisionTiles(&l0Tile, &l1Tile);
 
             // Check for collision with tree bases/stumps/bushes/poles
             if (l1Tile) {
                 if (l1Tile == 11 || l1Tile == 12 || l1Tile == 19 || l1Tile == 20 || l1Tile == 31 || l1Tile == 32 || l1Tile == 48 || l1Tile == 67 || l1Tile == 82) {
+                    finialTimerUpdate(ticks, &milli);
+                    showTimer(mins, secs, milli);
                     messageCenter("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode);
                     waitCount(180);
                     course = 0;
@@ -192,6 +180,8 @@ void main() {
 
             // Dead if off screen
             if (guyData.guyX > 640) {
+                finialTimerUpdate(ticks, &milli);
+                showTimer(mins, secs, milli);
                 messageCenter("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode);
                 waitCount(180);
                 break;
@@ -205,6 +195,8 @@ void main() {
 
             // See if finished
             if (course == 15 && scrollY >= 150 && scrollY < 200) {
+                finialTimerUpdate(ticks, &milli);
+                showTimer(mins, secs, milli);
                 if (guyData.guyX<240 || guyData.guyX > 400) {
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
@@ -242,10 +234,7 @@ void main() {
                 scrollX = scrollLimit;
             }
             
-            VERA.layer0.vscroll = scrollY;
-            VERA.layer1.vscroll = scrollY;
-            VERA.layer0.hscroll = scrollX;
-            VERA.layer1.hscroll = scrollX;
+            setScroll();
 
             // Timer
             ticks++;
@@ -259,6 +248,7 @@ void main() {
                 }
             }
 
+            // Only update the timer text every 1/4 second
             if (ticks == 15) {
                 milli = 25;
                 showTimer(mins, secs, milli);

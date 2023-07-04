@@ -36,5 +36,6 @@ void setZoom(unsigned char zoomMode);
 void clearLayers();
 void clearLayer0();
 void clearLayer1();
+void pickMode(unsigned char *zoomMode);
 
 #endif

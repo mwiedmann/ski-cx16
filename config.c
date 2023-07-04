@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "utils.h"
+#include "wait.h"
 
 void init() {
     unsigned char *tileFilename = "tilemap.bin";
@@ -77,4 +78,48 @@ void clearLayer1() {
 void clearLayers() {
     clearLayer0();
     clearLayer1();
+}
+
+void pickMode(unsigned char *zoomMode) {
+    unsigned char joy;
+
+    clearLayers();
+    
+    // Requires 640 mode
+    setZoom(1);
+
+    messageCenter("CHOOSE GRAPHICS MODE", 5, 11, 0, 0, 1);
+    messageCenter("USE JOYSTICK TO SELECT", 6, 12, 0, 0, 1);
+
+    while (1) {
+        joy = joy_read(0);
+
+        if (JOY_UP(joy) || JOY_DOWN(joy)) {
+            *zoomMode+=1;
+            if (*zoomMode == 2) {
+                *zoomMode = 0;
+            }
+
+            while(JOY_UP(joy) || JOY_DOWN(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+        }
+
+        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+            break;
+        }
+
+        messageCenter((*zoomMode) == 0 ? "::320X240::" : "  320X240  ", 7, 14, 0, 0, 1);
+        messageCenter("ZOOMED IN ACTION FEEL", 8, 15, 0, 0, 1);
+        
+        messageCenter((*zoomMode) == 1 ? "::640X480::" : "  640X480  ", 10, 17, 0, 0, 1);
+        messageCenter("BIGGER FIELD OF VIEW", 11, 18, 0, 0, 1);
+
+        wait();
+    }
 }
