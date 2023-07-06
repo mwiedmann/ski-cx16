@@ -221,7 +221,7 @@ void main() {
                 break;
             }
 
-            scrollY+= scrollSpeed>>4;
+            scrollY+= scrollSpeed;
             // Check max scroll value
             if (scrollY > 4095) {
                 scrollY = scrollY - 4095;

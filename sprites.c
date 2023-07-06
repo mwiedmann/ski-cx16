@@ -4,6 +4,8 @@
 #include "sprites.h"
 #include "config.h"
 
+signed char pushCount = 0, pushDir = 0;
+
 void spriteText(unsigned char* msg, unsigned char row) {
     unsigned short i, tile;
 
@@ -117,62 +119,47 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
 
     joy = joy_read(0);
 
-    // Steeper angle moves faster
-    // if (guyMoveX > 48 || guyMoveX < -48) {
-    //     scrollInc = inSnow ? 1 : 2;
-    //     scrollMax = inSnow ? 16 : 32;
-    // } else if (guyMoveX > 32 || guyMoveX < -32) {
-    //     scrollInc = inSnow ? 1 : 3;
-    //     scrollMax = inSnow ? 16 : 32;
-    // } else if (guyMoveX > 16 || guyMoveX < -16) {
-    //     scrollInc = inSnow ? 2 : 3;
-    //     scrollMax = inSnow ? 16 : 48;
-    // } else {
-    //     scrollInc = inSnow ? 2 : 3;
-    //     scrollMax = inSnow ? 16 : 64;
-    // }
-
-    if (guyData->guyMoveX > 42 || guyData->guyMoveX < -42) {
-        scrollInc = inSnow ? 1 : 2;
-        scrollMax = inSnow ? 16 : 16;
-    } else if (guyData->guyMoveX > 21 || guyData->guyMoveX < -21) {
-        scrollInc = inSnow ? 1 : 3;
-        scrollMax = inSnow ? 16 : 32;
-    } else {
-        scrollInc = inSnow ? 2 : 3;
-        scrollMax = inSnow ? 16 : 48;
-    }
-
-    // TESTING - Uncomment to always scroll slow
-    // scrollMax = 16;
-
-    *scrollSpeed += scrollInc;
-    if (*scrollSpeed > scrollMax) {
-        *scrollSpeed = scrollMax;
-    }
-
     if (JOY_LEFT(joy)) {
-        if (guyData->guyMoveX > 0) {
-            guyData->guyMoveX-= inSnow ? 1 : 3;
-        } else {
-            guyData->guyMoveX-= inSnow ? 1 : 2;
+        if (pushDir != -1) {
+            pushDir = -1;
+            pushCount = 0;
         }
-        
-        if (guyData->guyMoveX < -moveMax) {
-            guyData->guyMoveX = -moveMax;
-        }
+        pushCount++;
     } else if (JOY_RIGHT(joy)) {
-        if (guyData->guyMoveX < 0) {
-            guyData->guyMoveX+= inSnow ? 1 : 3;
-        } else {
-            guyData->guyMoveX+= inSnow ? 1 : 2;
+        if (pushDir != 1) {
+            pushDir = 1;
+            pushCount = 0;
         }
-        if (guyData->guyMoveX > moveMax) {
-            guyData->guyMoveX = moveMax;
-        }
+        pushCount++;
+    } else {
+        pushDir = 0;
+        pushCount = 0;
+    }
+
+    if (pushCount == 6) {
+        guyData->guyMoveX += pushDir;
+        pushCount = 0;
+    }
+
+    if (guyData->guyMoveX > 3) {
+        guyData->guyMoveX = 3;
+    } else if (guyData->guyMoveX < -3) {
+        guyData->guyMoveX = -3;
+    }
+
+    if (guyData->guyMoveX == 3 || guyData->guyMoveX == -3) {
+        scrollMax = 1;
+    } else if (guyData->guyMoveX == 2 || guyData->guyMoveX == -2) {
+        scrollMax = inSnow ? 1 : 2;
+    } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
+        scrollMax = inSnow ? 1 : 3;
+    } else {
+        scrollMax = inSnow ? 1 : 4;
     }
     
-    guyData->guyX+= guyData->guyMoveX>>4;
+    *scrollSpeed = scrollMax;
+
+    guyData->guyX+= guyData->guyMoveX;
 
     // Update Sprite 1 X/Y Position
     // Point to Sprite 1 byte 2
