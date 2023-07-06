@@ -2,6 +2,7 @@
 #include <cbm.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <joystick.h>
 
 #include "config.h"
@@ -9,6 +10,8 @@
 #include "utils.h"
 #include "wait.h"
 #include "sprites.h"
+
+#define MISSED_FLAG_PENALTY 3
 
 GuyData guyData;
 
@@ -43,13 +46,16 @@ void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     *l1Tile = VERA.data0;
 }
 
-void showTimer(unsigned char mins, unsigned char secs, unsigned char milli) {
+void showTimer(unsigned char mins, unsigned char secs, unsigned char milli, unsigned char missed) {
     unsigned char msg[24], buf[24];
 
     sprintf(buf, "%u:%02u.%02u", mins, secs, milli);
     sprintf(msg, "%12s", buf);
-
     spriteText(msg, 0);
+
+    sprintf(buf, "MISS:%02u", missed);
+    sprintf(msg, "%12s", buf);
+    spriteText(msg, 1);
 }
 
 void showTitle() {
@@ -99,9 +105,12 @@ void main() {
     unsigned char l1Tile;
     unsigned char inSnow;
     unsigned short scrollSpeed, scrollLimit, halfScrollLimit;
-    unsigned char mins, secs, ticks, milli;
+    unsigned char mins, secs, ticks, milli, missed;
     unsigned char course;
     unsigned runsUntilFinish;
+    unsigned char flagNum;
+
+    FlagTrackingList *flagsCurrent = 0, *flagsNext = 0;
 
     init();
     showTitle();
@@ -114,6 +123,8 @@ void main() {
         scrollY = 0;
         scrollX = 0;
         setScroll();
+
+        flagNum = 0;
 
         spritesConfig(&guyData, 0, 0); // hide sprites
 
@@ -141,10 +152,12 @@ void main() {
         mins = 0;
         secs = 0;
         milli = 0;
-        showTimer(mins, secs, milli);
+        missed = 0;
+
+        showTimer(mins, secs, milli, missed);
 
         // Load the top half of the starting course
-        drawPartialCourse(course, 0, 1);
+        flagsCurrent = drawPartialCourse(course, 0, 1);
 
         // Move the player into positon
         move(&guyData, scrollX, &scrollSpeed, inSnow);
@@ -161,7 +174,7 @@ void main() {
             if (l1Tile) {
                 if (l1Tile == 11 || l1Tile == 12 || l1Tile == 19 || l1Tile == 20 || l1Tile == 31 || l1Tile == 32 || l1Tile == 48 || l1Tile == 67 || l1Tile == 82) {
                     finialTimerUpdate(ticks, &milli);
-                    showTimer(mins, secs, milli);
+                    showTimer(mins, secs, milli, missed);
                     messageCenter("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode);
                     waitCount(180);
                     course = 0;
@@ -176,12 +189,31 @@ void main() {
                 inSnow = 0;
             }
 
+            // Check flags
+            if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
+                if (flagsCurrent->trackingData[flagNum].data.tile1 != 21 && flagsCurrent->trackingData[flagNum].data.tile1 != 22) {
+                    flagsCurrent->trackingData[flagNum].tracked = 1;
+                    flagNum++;
+                } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                    flagsCurrent->trackingData[flagNum].tracked = 1;
+                    flagNum++;
+                    secs+= MISSED_FLAG_PENALTY;
+                    missed++;
+                } else if (
+                    (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
+                    (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
+                    ) {
+                    flagsCurrent->trackingData[flagNum].tracked = 1;
+                    flagNum++;
+                }
+            }
+
             move(&guyData, scrollX, &scrollSpeed, inSnow);
 
             // Dead if off screen
             if (guyData.guyX > 640) {
                 finialTimerUpdate(ticks, &milli);
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
                 messageCenter("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode);
                 waitCount(180);
                 break;
@@ -196,7 +228,7 @@ void main() {
             // See if finished
             if (course == 15 && scrollY >= 150 && scrollY < 200) {
                 finialTimerUpdate(ticks, &milli);
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
                 if (guyData.guyX<240 || guyData.guyX > 400) {
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
@@ -219,9 +251,16 @@ void main() {
                     if (course == COURSE_COUNT) {
                         course = 0;
                     }
-                    drawPartialCourse(course, 0, 1);
+                    flagsNext = drawPartialCourse(course, 0, 1);
                 }
                 
+            } else if (scrollY < 8 && previousScroll > 4064) {
+                messageCenter("END 1", 15, 15, scrollX, scrollY, zoomMode);
+                free(flagsCurrent);
+                flagsCurrent = flagsNext;
+                flagsNext = 0;
+                flagNum = 0;
+                messageCenter("END 2", 16, 16, scrollX, scrollY, zoomMode);
             }
 
             previousScroll = scrollY;
@@ -251,20 +290,30 @@ void main() {
             // Only update the timer text every 1/4 second
             if (ticks == 15) {
                 milli = 25;
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
             } else if (ticks == 30) {
                 milli = 50;
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
             } else if (ticks == 45) {
                 milli = 75;
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
             } else if (ticks == 0) {
                 milli = 0;
-                showTimer(mins, secs, milli);
+                showTimer(mins, secs, milli, missed);
             }
 
             
             wait();
+        }
+
+        if (flagsCurrent) {
+            free(flagsCurrent);
+            flagsCurrent = 0;
+        }
+
+        if (flagsNext) {
+            free(flagsNext);
+            flagsNext = 0;
         }
     }
 }

@@ -1,4 +1,5 @@
 #include <cx16.h>
+#include <stdlib.h>
 
 #include "course.h"
 #include "config.h"
@@ -17,36 +18,55 @@ void loadCourses() {
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
 }
 
-void drawCourseFlags(unsigned char course, unsigned char half) {
+FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half) {
     unsigned char len, i;
     unsigned long addr;
     unsigned short bankAddr;
     FlagData *flagData;
+    FlagTrackingList *flagTrackingList;
 
     BANK_NUM = FLAGS_BANK;
 
     bankAddr = ((unsigned short)BANK_RAM) + (course * FLAG_BANK_SIZE);
     len = (*(unsigned char*)(bankAddr));
+
+    flagTrackingList = malloc(2 + (sizeof(FlagTrackingData) * len));
+    flagTrackingList->length = len;
+    flagTrackingList->type = FLAG_TYPE;
+
     flagData = (FlagData *)(bankAddr+1);
 
     for (i=0; i<len; i++) {
+        // Copy the flag data
+        flagTrackingList->trackingData[i].tracked = 0;
+        flagTrackingList->trackingData[i].data.row = flagData[i].row;
+        flagTrackingList->trackingData[i].data.tile1 = flagData[i].tile1;
+        flagTrackingList->trackingData[i].data.col1 = flagData[i].col1;
+        flagTrackingList->trackingData[i].data.tile2 = flagData[i].tile2;
+        flagTrackingList->trackingData[i].data.col2 = flagData[i].col2;
+
         // Skip the flags for the other half
         if ((half == 0 && flagData[i].row > 127) || (half == 1 && flagData[i].row <= 127)) {
             continue;
         }
-        addr = L1_MAPBASE_ADDR + (flagData[i].row * MAPBASE_TILE_WIDTH * 2) + (flagData[i].col * 2);
+
+        // TODO: Only supports type=1 for now
+        addr = L1_MAPBASE_ADDR + (flagData[i].row * MAPBASE_TILE_WIDTH * 2) + (flagData[i].col1 * 2);
         VERA.address =  addr;
         VERA.address_hi = L1_MAPBASE_ADDR>>16;
         // Set the Increment Mode, turn on bit 4
         VERA.address_hi |= 0b10000;
 
-        VERA.data0 = flagData[i].tile;
+        VERA.data0 = flagData[i].tile1;
         VERA.data0 = 0;
     }
+
+    return flagTrackingList;
 }
 
-void drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags) {
+FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags) {
     unsigned char l0bank, l1bank;
+    FlagTrackingList *flagTrackingList = 0;
 
     switch(course) {
         case 0 :
@@ -71,6 +91,14 @@ void drawPartialCourse(unsigned char course, unsigned char half, unsigned char d
     copyBankedRAMToVRAM(l1bank, L1_MAPBASE_ADDR + (half*MAPBASE_TILE_COUNT), MAPBASE_TILE_COUNT);
 
     if (drawFlags) {
-        drawCourseFlags(course, half);
+        flagTrackingList = drawCourseFlags(course, half);
     }
+
+    // Don't need flag data for the 2nd half since we already have it
+    if (half) {
+        free(flagTrackingList);
+        flagTrackingList = 0;
+    }
+
+    return flagTrackingList;
 }

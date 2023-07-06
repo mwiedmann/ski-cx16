@@ -82,7 +82,7 @@ void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show)
     // VRAM address for sprite 1 (this is fixed)
     unsigned long spriteGraphicAddress = TILEBASE_ADDR + (72 * 256);
     guyData->guyX = 480;
-    guyData->guyY = 16;
+    guyData->guyY = 32;
     guyData->guyMoveX = 0;
     guyData->guyMoveY = 0;
 

@@ -42,9 +42,11 @@ const createLevelCode = (levelNum, level) => {
   const addFlags = (gridTiles) => {
     const bytes = []
     gridTiles.forEach((g) => {
-        bytes.push(g.t + 1) // Add 1 because we have a blank tile before the loaded tiles
-        bytes.push(parseInt(g.px[0] / 16))
-        bytes.push(parseInt(g.px[1] / 16))
+      bytes.push(parseInt(g.px[1] / 16)) // row
+      bytes.push(g.t + 1) // tile1 - Add 1 because we have a blank tile before the loaded tiles
+      bytes.push(parseInt(g.px[0] / 16)) // col1
+      bytes.push(0) // tile2
+      bytes.push(0) // col2
     });
 
     return bytes
