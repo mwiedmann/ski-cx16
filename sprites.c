@@ -151,10 +151,8 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
         scrollMax = 1;
     } else if (guyData->guyMoveX == 2 || guyData->guyMoveX == -2) {
         scrollMax = inSnow ? 1 : 2;
-    } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
-        scrollMax = inSnow ? 1 : 3;
     } else {
-        scrollMax = inSnow ? 1 : 4;
+        scrollMax = inSnow ? 1 : 3;
     }
     
     *scrollSpeed = scrollMax;
