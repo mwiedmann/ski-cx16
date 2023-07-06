@@ -136,7 +136,7 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
         pushCount = 0;
     }
 
-    if (pushCount == 6) {
+    if (pushCount == 7) {
         guyData->guyMoveX += pushDir;
         pushCount = 0;
     }
