@@ -16,7 +16,7 @@
 GuyData guyData;
 
 short scrollY = 0, previousScroll = 0, scrollX = 0;
-unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 0;
+unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 0, gameMode = 1;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     unsigned char tileX, tileY;
@@ -128,8 +128,8 @@ void main() {
 
         spritesConfig(&guyData, 0, 0); // hide sprites
 
-        // Pick the graphics mode and set the zoom level accordingly
-        pickMode(&zoomMode);
+        // Pick the game and graphics mode and set the zoom level accordingly
+        pickModes(&zoomMode, &gameMode);
         setZoom(zoomMode);
 
         course = 0; // Starting course
@@ -157,7 +157,7 @@ void main() {
         showTimer(mins, secs, milli, missed);
 
         // Load the top half of the starting course
-        flagsCurrent = drawPartialCourse(course, 0, 1);
+        flagsCurrent = drawPartialCourse(course, 0, 1, gameMode);
 
         // Move the player into positon
         move(&guyData, scrollX, &scrollSpeed, inSnow);
@@ -190,24 +190,26 @@ void main() {
             }
 
             // Check flags
-            if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
-                if (flagsCurrent->trackingData[flagNum].data.tile1 != 21 && flagsCurrent->trackingData[flagNum].data.tile1 != 22) {
-                    flagsCurrent->trackingData[flagNum].tracked = 1;
-                    flagNum++;
-                } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
-                    flagsCurrent->trackingData[flagNum].tracked = 1;
-                    flagNum++;
-                    secs+= MISSED_FLAG_PENALTY;
-                    missed++;
-                } else if (
-                    (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
-                    (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
-                    ) {
-                    flagsCurrent->trackingData[flagNum].tracked = 1;
-                    flagNum++;
+            if (gameMode != GAME_MODE_FREE) {
+                if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
+                    if (flagsCurrent->trackingData[flagNum].data.tile1 != 21 && flagsCurrent->trackingData[flagNum].data.tile1 != 22) {
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                    } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                        secs+= MISSED_FLAG_PENALTY;
+                        missed++;
+                    } else if (
+                        (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
+                        (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
+                        ) {
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                    }
                 }
             }
-
+            
             move(&guyData, scrollX, &scrollSpeed, inSnow);
 
             // Dead if off screen
@@ -240,27 +242,27 @@ void main() {
 
             // See if we hit any breakpoints where we need to load more course data
             if (scrollY >= 1024 && previousScroll < 1024) {
-                drawPartialCourse(course, 1, 1);
+                drawPartialCourse(course, 1, 1, gameMode);
             } else if (scrollY >= 3072 && previousScroll < 3072) {
                 runsUntilFinish--;
                 if (runsUntilFinish == 0) {
                     course = 15;
-                    drawPartialCourse(course, 0, 0);
+                    drawPartialCourse(course, 0, 0, gameMode);
                 } else {
                     course++;
                     if (course == COURSE_COUNT) {
                         course = 0;
                     }
-                    flagsNext = drawPartialCourse(course, 0, 1);
+                    flagsNext = drawPartialCourse(course, 0, 1, gameMode);
                 }
                 
             } else if (scrollY < 8 && previousScroll > 4064) {
-                messageCenter("END 1", 15, 15, scrollX, scrollY, zoomMode);
-                free(flagsCurrent);
+                if (flagsCurrent) {
+                    free(flagsCurrent);
+                }
                 flagsCurrent = flagsNext;
                 flagsNext = 0;
                 flagNum = 0;
-                messageCenter("END 2", 16, 16, scrollX, scrollY, zoomMode);
             }
 
             previousScroll = scrollY;

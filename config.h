@@ -31,11 +31,15 @@
 #define CFINISH_L0_BANK 32 + COURSE_LAYER_BANK_SIZE
 #define CFINISH_L1_BANK CFINISH_L0_BANK + COURSE_LAYER_BANK_SIZE
 
+#define GAME_MODE_FREE 0
+#define GAME_MODE_FLAGS 1
+#define GAME_MODE_GATES 2
+
 void init();
 void setZoom(unsigned char zoomMode);
 void clearLayers();
 void clearLayer0();
 void clearLayer1();
-void pickMode(unsigned char *zoomMode);
+void pickModes(unsigned char *zoomMode, unsigned char *gameMode);
 
 #endif

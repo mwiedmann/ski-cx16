@@ -80,7 +80,7 @@ void clearLayers() {
     clearLayer1();
 }
 
-void pickMode(unsigned char *zoomMode) {
+void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
     unsigned char joy;
 
     clearLayers();
@@ -88,6 +88,7 @@ void pickMode(unsigned char *zoomMode) {
     // Requires 640 mode
     setZoom(1);
 
+    // Pick graphics mode
     messageCenter("CHOOSE GRAPHICS MODE", 5, 11, 0, 0, 1);
     messageCenter("USE JOYSTICK TO SELECT", 6, 12, 0, 0, 1);
 
@@ -119,6 +120,50 @@ void pickMode(unsigned char *zoomMode) {
         
         messageCenter((*zoomMode) == 1 ? "::640X480::" : "  640X480  ", 10, 17, 0, 0, 1);
         messageCenter("BIGGER FIELD OF VIEW", 11, 18, 0, 0, 1);
+
+        wait();
+    }
+
+    // Pick game mode
+    clearLayers();
+    messageCenter("CHOOSE GAME MODE", 5, 11, 0, 0, 1);
+    messageCenter("USE JOYSTICK TO SELECT", 6, 12, 0, 0, 1);
+
+    while (1) {
+        joy = joy_read(0);
+
+        if (JOY_UP(joy) || JOY_DOWN(joy)) {
+            *gameMode+=1;
+            if (*gameMode == 3) {
+                *gameMode = 0;
+            }
+
+            while(JOY_UP(joy) || JOY_DOWN(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+        }
+
+        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+            break;
+        }
+
+        messageCenter((*gameMode) == GAME_MODE_FREE ? "::OPEN::" : "  OPEN  ", 7, 14, 0, 0, 1);
+        messageCenter("TIME ONLY", 8, 15, 0, 0, 1);
+
+        messageCenter((*gameMode) == GAME_MODE_FLAGS ? "::FLAGS::" : "  FLAGS  ", 10, 17, 0, 0, 1);
+        messageCenter("SKI AROUND FLAGS", 11, 18, 0, 0, 1);
+        
+        messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 20, 0, 0, 1);
+        messageCenter("SKI BETWEEN GATES", 14, 21, 0, 0, 1);
+
+        messageCenter("THERE IS A 3 SEC TIME", 14, 21, 0, 0, 1);
+        messageCenter("PENALTY FOR MISSING", 15, 21, 0, 0, 1);
+        messageCenter("FLAGS AND GATES", 16, 22, 0, 0, 1);
 
         wait();
     }

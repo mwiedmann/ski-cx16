@@ -18,7 +18,7 @@ void loadCourses() {
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
 }
 
-FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half) {
+FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half, unsigned char gameMode) {
     unsigned char len, i;
     unsigned long addr;
     unsigned short bankAddr;
@@ -59,12 +59,24 @@ FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half) {
 
         VERA.data0 = flagData[i].tile1;
         VERA.data0 = 0;
+
+        // Display both tiles if this is a gate
+        if (gameMode == GAME_MODE_GATES) {
+            addr = L1_MAPBASE_ADDR + (flagData[i].row * MAPBASE_TILE_WIDTH * 2) + (flagData[i].col2 * 2);
+            VERA.address =  addr;
+            VERA.address_hi = L1_MAPBASE_ADDR>>16;
+            // Set the Increment Mode, turn on bit 4
+            VERA.address_hi |= 0b10000;
+
+            VERA.data0 = flagData[i].tile2;
+            VERA.data0 = 0;
+        }
     }
 
     return flagTrackingList;
 }
 
-FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags) {
+FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags, unsigned char gameMode) {
     unsigned char l0bank, l1bank;
     FlagTrackingList *flagTrackingList = 0;
 
@@ -90,12 +102,12 @@ FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, u
     copyBankedRAMToVRAM(l0bank, L0_MAPBASE_ADDR + (half*MAPBASE_TILE_COUNT), MAPBASE_TILE_COUNT);
     copyBankedRAMToVRAM(l1bank, L1_MAPBASE_ADDR + (half*MAPBASE_TILE_COUNT), MAPBASE_TILE_COUNT);
 
-    if (drawFlags) {
-        flagTrackingList = drawCourseFlags(course, half);
+    if (drawFlags && gameMode != GAME_MODE_FREE) {
+        flagTrackingList = drawCourseFlags(course, half, gameMode);
     }
 
     // Don't need flag data for the 2nd half since we already have it
-    if (half) {
+    if (half && flagTrackingList) {
         free(flagTrackingList);
         flagTrackingList = 0;
     }
