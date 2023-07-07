@@ -126,8 +126,8 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
 
     // Pick game mode
     clearLayers();
-    messageCenter("CHOOSE GAME MODE", 5, 11, 0, 0, 1);
-    messageCenter("USE JOYSTICK TO SELECT", 6, 12, 0, 0, 1);
+    messageCenter("CHOOSE GAME MODE", 5, 7, 0, 0, 1);
+    messageCenter("USE JOYSTICK TO SELECT", 6, 8, 0, 0, 1);
 
     while (1) {
         joy = joy_read(0);
@@ -152,18 +152,18 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
             break;
         }
 
-        messageCenter((*gameMode) == GAME_MODE_FREE ? "::OPEN::" : "  OPEN  ", 7, 14, 0, 0, 1);
-        messageCenter("TIME ONLY", 8, 15, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_FREE ? "::OPEN::" : "  OPEN  ", 7, 10, 0, 0, 1);
+        messageCenter("TIME ONLY", 8, 11, 0, 0, 1);
 
-        messageCenter((*gameMode) == GAME_MODE_FLAGS ? "::FLAGS::" : "  FLAGS  ", 10, 17, 0, 0, 1);
-        messageCenter("SKI AROUND FLAGS", 11, 18, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_FLAGS ? "::FLAGS::" : "  FLAGS  ", 10, 13, 0, 0, 1);
+        messageCenter("SKI AROUND FLAGS", 11, 14, 0, 0, 1);
         
-        messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 20, 0, 0, 1);
-        messageCenter("SKI BETWEEN GATES", 14, 21, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 16, 0, 0, 1);
+        messageCenter("SKI BETWEEN GATES", 14, 17, 0, 0, 1);
 
-        messageCenter("THERE IS A 3 SEC TIME", 16, 23, 0, 0, 1);
-        messageCenter("PENALTY FOR MISSING", 17, 24, 0, 0, 1);
-        messageCenter("FLAGS AND GATES", 18, 25, 0, 0, 1);
+        messageCenter("THERE IS A 3 SEC TIME", 16, 19, 0, 0, 1);
+        messageCenter("PENALTY FOR MISSING", 17, 20, 0, 0, 1);
+        messageCenter("FLAGS AND GATES", 18, 21, 0, 0, 1);
 
         wait();
     }
