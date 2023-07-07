@@ -105,6 +105,21 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned shor
         }
     }
 
+    // A high score was entered
+    // Save the new list
+    if (scoreRow != 99) {
+        // NOTE: the "@:" prefix allows us to overwrite a file
+        sprintf(buf, "@:score%u.bin", gameMode);
+        cbm_k_setnam(buf);
+        // SAVE adds the 2 byte header and we can't stop it
+        cbm_k_setlfs(0, 8, 0);
+
+        scoreList.length = (mem - ((unsigned short)BANK_RAM)) / sizeof(Score);
+        scoreList.scores = (Score*)BANK_RAM;
+
+        cbm_k_save((unsigned short)scoreList.scores, ((unsigned short)scoreList.scores) + (sizeof(Score) * scoreList.length));
+    }
+
     messageCenter(" PRESS A BUTTON ", 13, 20, scrollX, scrollY, zoomMode);
     messageCenter(" TO CONTINUE ", 14, 21, scrollX, scrollY, zoomMode);
 
