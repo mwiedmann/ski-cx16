@@ -120,7 +120,7 @@ void main() {
     unsigned short scrollSpeed, scrollLimit, halfScrollLimit, totalTicks;
     unsigned char mins, secs, ticks, milli, missed, madeIt;
     unsigned char course;
-    unsigned runsUntilFinish;
+    unsigned char runsUntilFinish, courseCount = 1;
     unsigned char flagNum;
 
     FlagTrackingList *flagsCurrent = 0, *flagsNext = 0;
@@ -142,17 +142,17 @@ void main() {
         spritesConfig(&guyData, 0, 0); // hide sprites
 
         // Pick the game and graphics mode and set the zoom level accordingly
-        pickModes(&zoomMode, &gameMode);
+        pickModes(&zoomMode, &gameMode, &courseCount);
 
         // Set the zoom level
         clearLayers();
         setZoom(zoomMode);
 
         // Show the high scores for this mode
-        displayScores(zoomMode, gameMode, scrollX, scrollY, 65535U);
+        displayScores(zoomMode, gameMode, courseCount, scrollX, scrollY, 65535U);
 
         course = 0; // Starting course
-        runsUntilFinish = 2; // How many courses until the finish line
+        runsUntilFinish = courseCount; // How many courses until the finish line
         inSnow = 0;
 
         // Set scroll limits for the lo-res (320x240) graphics mode
@@ -364,6 +364,6 @@ void main() {
         setScroll();
         clearLayers();
         spritesConfig(&guyData, 0, 0); // hide sprites
-        displayScores(zoomMode, gameMode, scrollX, scrollY, madeIt ? totalTicks : 65535U);
+        displayScores(zoomMode, gameMode, courseCount, scrollX, scrollY, madeIt ? totalTicks : 65535U);
     }
 }

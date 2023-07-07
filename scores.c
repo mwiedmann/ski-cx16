@@ -10,7 +10,7 @@
 
 #define KEY_DELAY 10
 
-void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
+void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount, unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
     unsigned short mins, secs, milli, ticks, mem;
     signed char b, i;
     unsigned char buf[24];
@@ -20,7 +20,7 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned shor
 
     BANK_NUM = SCORE_BANK;
 
-    sprintf(buf, "score%u.bin", gameMode);
+    sprintf(buf, "score%u%u.bin", gameMode, courseCount);
 
     cbm_k_setnam(buf);
     cbm_k_setlfs(0, 8, 0); // has 2 byte header because cbm_k_save will add it
@@ -30,6 +30,16 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned shor
     scoreList.length = (mem - ((unsigned short)BANK_RAM)) / sizeof(Score);
     scoreList.scores = (Score*)BANK_RAM;
 
+    sprintf(buf, "%s-%s",
+        courseCount == 1
+            ? "SHORT"
+            : courseCount == 2
+                ? "MEDIUM"
+                : courseCount == 3
+                    ? "LONG" : "EPIC",
+        gameMode == GAME_MODE_FREE ? "FREE" : "FLAGS");
+
+    messageCenter(buf, 0, 6, scrollX, scrollY, zoomMode);
     messageCenter("HIGH SCORES", 1, 7, scrollX, scrollY, zoomMode);
 
     while (!nameDone) {
@@ -109,7 +119,7 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned shor
     // Save the new list
     if (scoreRow != 99) {
         // NOTE: the "@:" prefix allows us to overwrite a file
-        sprintf(buf, "@:score%u.bin", gameMode);
+        sprintf(buf, "@:score%u%u.bin", gameMode, courseCount);
         cbm_k_setnam(buf);
         // SAVE adds the 2 byte header and we can't stop it
         cbm_k_setlfs(0, 8, 0);

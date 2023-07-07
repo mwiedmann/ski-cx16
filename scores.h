@@ -11,6 +11,7 @@ typedef struct ScoreList {
     Score *scores;
 } ScoreList;
 
-void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned short scrollX, unsigned short scrollY, unsigned short newTicks);
+void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount,
+    unsigned short scrollX, unsigned short scrollY, unsigned short newTicks);
 
 #endif

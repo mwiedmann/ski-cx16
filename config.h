@@ -42,7 +42,7 @@ void setZoom(unsigned char zoomMode);
 void clearLayers();
 void clearLayer0();
 void clearLayer1();
-void pickModes(unsigned char *zoomMode, unsigned char *gameMode);
+void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount);
 void waitForButtonPress();
 
 #endif

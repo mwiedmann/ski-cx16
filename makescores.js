@@ -14,6 +14,9 @@ const charBump = 128
 const bytes = vals.map(v => ([shortLo(v.score), shortHi(v.score), v.name.charCodeAt(0)+charBump, v.name.charCodeAt(1)+charBump, v.name.charCodeAt(2)+charBump, 0])).flat();
 
 let output = new Uint8Array([0,0,...bytes]);
-fs.writeFileSync("SCORE0.BIN", output, "binary");
-fs.writeFileSync("SCORE1.BIN", output, "binary");
-fs.writeFileSync("SCORE2.BIN", output, "binary");
+
+for (let count=1; count<=4; count++) {
+    for (let mode=0; mode<=1; mode++) {
+        fs.writeFileSync(`SCORE${mode}${count}.BIN`, output, "binary");
+    }
+}

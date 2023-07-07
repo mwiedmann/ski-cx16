@@ -80,7 +80,7 @@ void clearLayers() {
     clearLayer1();
 }
 
-void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
+void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount) {
     unsigned char joy;
 
     clearLayers();
@@ -164,6 +164,65 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
         messageCenter("THERE IS A 5 SEC TIME", 16, 19, 0, 0, 1);
         messageCenter("PENALTY FOR MISSING", 17, 20, 0, 0, 1);
         messageCenter("FLAGS AND GATES", 18, 21, 0, 0, 1);
+
+        wait();
+    }
+
+    // Pick game mode
+    clearLayers();
+    messageCenter("CHOOSE RUN LENGTH", 5, 5, 0, 0, 1);
+    messageCenter("USE JOYSTICK TO SELECT", 6, 6, 0, 0, 1);
+
+    while (1) {
+        joy = joy_read(0);
+
+        if (JOY_DOWN(joy)) {
+            *courseCount+=1;
+            if (*courseCount == 5) {
+                *courseCount = 1;
+            }
+
+            while(JOY_DOWN(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+        }
+
+        if (JOY_UP(joy)) {
+            *courseCount-=1;
+            if (*courseCount == 0) {
+                *courseCount = 4;
+            }
+
+            while(JOY_UP(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+        }
+
+        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+            break;
+        }
+
+        messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 7, 8, 0, 0, 1);
+        messageCenter("1 COURSE", 8, 9, 0, 0, 1);
+
+        messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 10, 11, 0, 0, 1);
+        messageCenter("2 COURSES", 11, 12, 0, 0, 1);
+        
+        messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 13, 14, 0, 0, 1);
+        messageCenter("3 COURSES", 14, 15, 0, 0, 1);
+
+        messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 16, 17, 0, 0, 1);
+        messageCenter("4 COURSES", 17, 18, 0, 0, 1);
+
+        messageCenter("LONGER RUNS MAY INCLUDE", 16, 20, 0, 0, 1);
+        messageCenter("REPEATED COURSES UNTIL", 16, 21, 0, 0, 1);
+        messageCenter("MORE COURSES ARE AVAILABLE", 16, 22, 0, 0, 1);
 
         wait();
     }

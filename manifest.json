@@ -2,7 +2,7 @@
     "manifest_version": "1.0.0",
     "name": "Ski",
     "author": "Mark Wiedmann",
-    "app_version": "0.1.0",
+    "app_version": "0.2.0",
     "license": "private",
     "start_prg": "SKI.PRG",
     "resources": [
@@ -17,6 +17,14 @@
         "C15FLAGS.BIN",
         "SKI.PRG",
         "TILEMAP.BIN",
-        "TILEMAP.PAL"
+        "TILEMAP.PAL",
+        "SCORE01.BIN",
+        "SCORE02.BIN",
+        "SCORE03.BIN",
+        "SCORE04.BIN",
+        "SCORE11.BIN",
+        "SCORE12.BIN",
+        "SCORE13.BIN",
+        "SCORE14.BIN"
    ]
 }
