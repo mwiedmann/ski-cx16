@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "wait.h"
 #include "sprites.h"
+#include "scores.h"
 
 #define MISSED_FLAG_PENALTY 3
 
@@ -104,8 +105,8 @@ void main() {
     unsigned char l0Tile;
     unsigned char l1Tile;
     unsigned char inSnow;
-    unsigned short scrollSpeed, scrollLimit, halfScrollLimit;
-    unsigned char mins, secs, ticks, milli, missed;
+    unsigned short scrollSpeed, scrollLimit, halfScrollLimit, totalTicks;
+    unsigned char mins, secs, ticks, milli, missed, madeIt;
     unsigned char course;
     unsigned runsUntilFinish;
     unsigned char flagNum;
@@ -116,7 +117,7 @@ void main() {
     showTitle();
 
     loadCourses();
-    waitCount(120);
+    //waitCount(120);
   
     while(1) {
         // Reset scrolling
@@ -130,7 +131,13 @@ void main() {
 
         // Pick the game and graphics mode and set the zoom level accordingly
         pickModes(&zoomMode, &gameMode);
+
+        // Set the zoom level
+        clearLayers();
         setZoom(zoomMode);
+
+        // Show the high scores for this mode
+        displayScores(zoomMode, gameMode, scrollX, scrollY, 65535U);
 
         course = 0; // Starting course
         runsUntilFinish = 4; // How many courses until the finish line
@@ -148,11 +155,14 @@ void main() {
         setScroll();
 
         // Reset the timer
+        totalTicks = 0;
         ticks = 0;
         mins = 0;
         secs = 0;
         milli = 0;
         missed = 0;
+
+        madeIt = 0;
 
         showTimer(mins, secs, milli, missed);
 
@@ -235,6 +245,7 @@ void main() {
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
                     messageCenter("FINISHED!!!", 7, 15, scrollX, scrollY, zoomMode);
+                    madeIt = 1;
                 }
                 waitCount(180);
                 break;
@@ -279,7 +290,8 @@ void main() {
 
             // Timer
             ticks++;
-            
+            totalTicks++;
+
             if (ticks == 60) {
                 ticks = 0;
                 secs++;
@@ -317,5 +329,15 @@ void main() {
             free(flagsNext);
             flagsNext = 0;
         }
+
+        // Show high scores
+        // TODO: Add name to list if score is better
+        // Reset scrolling
+        scrollY = 0;
+        scrollX = 0;
+        setScroll();
+        clearLayers();
+        spritesConfig(&guyData, 0, 0); // hide sprites
+        displayScores(zoomMode, gameMode, scrollX, scrollY, madeIt ? totalTicks : 65535U);
     }
 }

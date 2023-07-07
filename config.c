@@ -161,10 +161,26 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode) {
         messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 20, 0, 0, 1);
         messageCenter("SKI BETWEEN GATES", 14, 21, 0, 0, 1);
 
-        messageCenter("THERE IS A 3 SEC TIME", 14, 21, 0, 0, 1);
-        messageCenter("PENALTY FOR MISSING", 15, 21, 0, 0, 1);
-        messageCenter("FLAGS AND GATES", 16, 22, 0, 0, 1);
+        messageCenter("THERE IS A 3 SEC TIME", 16, 23, 0, 0, 1);
+        messageCenter("PENALTY FOR MISSING", 17, 24, 0, 0, 1);
+        messageCenter("FLAGS AND GATES", 18, 25, 0, 0, 1);
 
         wait();
+    }
+}
+
+void waitForButtonPress() {
+    unsigned char joy;
+
+    while(1) {
+        joy = joy_read(0);
+
+        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+            break;
+        }
     }
 }

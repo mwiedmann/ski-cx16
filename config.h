@@ -31,6 +31,8 @@
 #define CFINISH_L0_BANK 32 + COURSE_LAYER_BANK_SIZE
 #define CFINISH_L1_BANK CFINISH_L0_BANK + COURSE_LAYER_BANK_SIZE
 
+#define SCORE_BANK 50
+
 #define GAME_MODE_FREE 0
 #define GAME_MODE_FLAGS 1
 #define GAME_MODE_GATES 2
@@ -41,5 +43,6 @@ void clearLayers();
 void clearLayer0();
 void clearLayer1();
 void pickModes(unsigned char *zoomMode, unsigned char *gameMode);
+void waitForButtonPress();
 
 #endif
