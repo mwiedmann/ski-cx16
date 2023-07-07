@@ -12,7 +12,7 @@
 #include "sprites.h"
 #include "scores.h"
 
-#define MISSED_FLAG_PENALTY 3
+#define MISSED_FLAG_PENALTY_TICKS 300
 
 GuyData guyData;
 
@@ -101,6 +101,18 @@ void finialTimerUpdate(unsigned char ticks, unsigned char *milli) {
     *milli = (ticks*100)/60;
 }
 
+void refreshTimerFromTicks(unsigned short totalTicks, unsigned char *mins, unsigned char *secs, unsigned char *ticks, unsigned char *milli) {
+    *mins = totalTicks / 3600;
+    totalTicks-= (*mins) * 3600;
+
+    *secs = totalTicks / 60;
+    totalTicks -= (*secs) * 60;
+
+    *ticks = totalTicks;
+
+    *milli = (totalTicks*100)/60;
+}
+
 void main() {
     unsigned char l0Tile;
     unsigned char l1Tile;
@@ -140,7 +152,7 @@ void main() {
         displayScores(zoomMode, gameMode, scrollX, scrollY, 65535U);
 
         course = 0; // Starting course
-        runsUntilFinish = 4; // How many courses until the finish line
+        runsUntilFinish = 2; // How many courses until the finish line
         inSnow = 0;
 
         // Set scroll limits for the lo-res (320x240) graphics mode
@@ -182,7 +194,10 @@ void main() {
 
             // Check for collision with tree bases/stumps/bushes/poles
             if (l1Tile) {
-                if (l1Tile == 11 || l1Tile == 12 || l1Tile == 19 || l1Tile == 20 || l1Tile == 31 || l1Tile == 32 || l1Tile == 48 || l1Tile == 67 || l1Tile == 82) {
+                // YES - It would be better if these tiles were together in the tileset so I could just do (l1Tile >= X & l1Tile <= Y)
+                // but its too much work to refactor the tileset now. If this becomes a bottleneck I'll do it!
+                if (l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
+                    l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK) {
                     finialTimerUpdate(ticks, &milli);
                     showTimer(mins, secs, milli, missed);
                     messageCenter("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode);
@@ -193,7 +208,9 @@ void main() {
             }
 
             // Check if on course or in heavy snow...changes speed
-            if (l0Tile == 1 || l0Tile == 6) {
+            // YES - It would also be better if these tiles were together....sigh
+            if (l0Tile == SNOW || l0Tile == SNOW_WITH_DOTS || l0Tile == SNOW_ANGLED_1 || l0Tile == SNOW_ANGLED_2 || l0Tile == SNOW_ANGLED_3 ||
+                l0Tile == SNOW_ANGLED_4 || l0Tile == RED_ARROW_BIG_1 || l0Tile == RED_ARROW_BIG_2 || l0Tile == BLUE_ARROW_BIG_1 || l0Tile == BLUE_ARROW_BIG_2) {
                 inSnow = 1;
             } else {
                 inSnow = 0;
@@ -208,8 +225,12 @@ void main() {
                     } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
-                        secs+= MISSED_FLAG_PENALTY;
                         missed++;
+
+                        // Time penalty
+                        totalTicks+= MISSED_FLAG_PENALTY_TICKS;
+                        // Update all the timer segments from the new totalTicks
+                        refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli); 
                     } else if (
                         (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
                         (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
@@ -231,7 +252,12 @@ void main() {
                 break;
             }
 
-            scrollY+= scrollSpeed;
+            // Only scroll on odd frames at slowest speed
+            if (scrollSpeed == 0 && ((ticks & 1) == 0)) {
+                scrollY+= 1;
+            } else {
+                scrollY+= scrollSpeed;
+            }
             // Check max scroll value
             if (scrollY > 4095) {
                 scrollY = scrollY - 4095;

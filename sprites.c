@@ -141,23 +141,34 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
         pushCount = 0;
     }
 
-    if (guyData->guyMoveX > 3) {
-        guyData->guyMoveX = 3;
-    } else if (guyData->guyMoveX < -3) {
-        guyData->guyMoveX = -3;
+    if (guyData->guyMoveX > 4) {
+        guyData->guyMoveX = 4;
+    } else if (guyData->guyMoveX < -4) {
+        guyData->guyMoveX = -4;
     }
 
-    if (guyData->guyMoveX == 3 || guyData->guyMoveX == -3) {
+    if (guyData->guyMoveX == 4 || guyData->guyMoveX == -4) {
+        scrollMax = 0;
+    } else if (guyData->guyMoveX == 3 || guyData->guyMoveX == -3) {
         scrollMax = 1;
     } else if (guyData->guyMoveX == 2 || guyData->guyMoveX == -2) {
         scrollMax = inSnow ? 1 : 2;
-    } else {
+    } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
         scrollMax = inSnow ? 1 : 3;
+    } else {
+        scrollMax = inSnow ? 1 : 4;
     }
     
     *scrollSpeed = scrollMax;
 
-    guyData->guyX+= guyData->guyMoveX;
+    // Limit side move to 3 but slower downhill
+    if (guyData->guyMoveX == 4) {
+        guyData->guyX+= 3; 
+    } else if (guyData->guyMoveX == -4) {
+        guyData->guyX-= 3;
+    } else {
+        guyData->guyX+= guyData->guyMoveX;
+    }
 
     // Update Sprite 1 X/Y Position
     // Point to Sprite 1 byte 2
