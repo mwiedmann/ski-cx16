@@ -79,9 +79,47 @@ void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, uns
     }
 }
 
+void restoreRow(unsigned char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode) {
+    unsigned short i;
+    unsigned char row = zoomMode == 0 ? row0 : row1;
+    unsigned long addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2);
+
+    VERA.address = addr;
+    VERA.address_hi = addr>>16;
+    // Always set the Increment Mode, turn on bit 4
+    VERA.address_hi |= 0b10000;
+
+    for (i=0; i<MAPBASE_TILE_WIDTH * 2; i+=2) {
+        VERA.data0 = save[i];
+        VERA.data0 = save[i+1];
+    }
+}
+
 void message(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY) {
+    messageSave(msg, row, col, scrollX, scrollY, 0);
+}
+
+void messageSave(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY, unsigned char* save) {
     unsigned short i, tile;
-    unsigned long addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2) + (((scrollX>>4) + col) * 2);
+    unsigned long addr;
+
+    // Save the existing tiles if we have a buffer
+    // They can be restored later to erase the message
+    if (save) {
+        addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2);
+
+        VERA.address = addr;
+        VERA.address_hi = addr>>16;
+        // Always set the Increment Mode, turn on bit 4
+        VERA.address_hi |= 0b10000;
+
+        for (i=0; i<MAPBASE_TILE_WIDTH * 2; i+=2) {
+            save[i] = VERA.data0;
+            save[i+1] = VERA.data0;
+        }
+    }
+
+    addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2) + (((scrollX>>4) + col) * 2);
 
     // Draw the tileset to layer 0
     VERA.address = addr;
@@ -125,11 +163,15 @@ void message(unsigned char* msg, unsigned char row, unsigned char col, unsigned 
 }
 
 void messageCenter(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode) {
+    messageCenterSave(msg, row0, row1, scrollX, scrollY, zoomMode, 0);
+}
+
+void messageCenterSave(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode, unsigned char* save) {
     unsigned char len, col;
     unsigned char offset = zoomMode == 1 ? 41 : 21;
     len = strlen(msg);
 
     col = (offset - len)>>1;
 
-    message(msg, zoomMode == 0 ? row0 : row1, col, scrollX, scrollY);
+    messageSave(msg, zoomMode == 0 ? row0 : row1, col, scrollX, scrollY, save);
 }

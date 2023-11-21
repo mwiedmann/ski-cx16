@@ -14,7 +14,10 @@
 void loadFileToVRAM(unsigned char *filename, unsigned long addr);
 void loadFileToBankedRAM(unsigned char *filename, unsigned char bank, unsigned short addr);
 void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, unsigned long length);
+void restoreRow(unsigned char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode);
 void message(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY);
+void messageSave(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY, unsigned char* save);
 void messageCenter(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode);
+void messageCenterSave(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode, unsigned char* save);
 
 #endif

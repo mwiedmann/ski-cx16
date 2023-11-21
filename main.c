@@ -52,28 +52,39 @@ void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
 
 void getSafeSpot() {
     unsigned char l0Tile = 0, l1Tile = 0;
+    signed short dir = 16;
+    unsigned short orgX;
+
+    orgX = guyData.guyX;
 
     // Move player a bit back after a collision
     scrollY-= COLLISION_MOVE_BACK_PIXELS;
-    
-    // Start on left side.
-    guyData.guyX = 8;
 
     // Go from left to right and find a safe tile for the player
     do {
-        // Place the player to this potentially safe spot
-        guyData.guyX+= 16;
-        
         getCollisionTiles(&l0Tile, &l1Tile);
-        if (guyData.guyX>639) {
+        
+        if ((l1Tile != RED_NET && l1Tile != BLUE_NET && l1Tile != GREEN_TREE_BASE && l1Tile != DEAD_TREE_BASE && l1Tile != GREEN_MINI_TREE &&
+        l1Tile != GREEN_MINI_DEAD_TREE && l1Tile != STUMP && l1Tile != POLE && l1Tile != ROCK)
+        &&
+        // Fast snow tiles
+        (l0Tile == 3 || l0Tile == 4 || l0Tile ==  27 || l0Tile == 28 || l0Tile == 39 || l0Tile == 40)) {
             break;
         }
-    } while(
-        l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
-        l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK
-        ||
-        l0Tile == SNOW || l0Tile == SNOW_WITH_DOTS || l0Tile == SNOW_ANGLED_1 || l0Tile == SNOW_ANGLED_2 || l0Tile == SNOW_ANGLED_3 ||
-        l0Tile == SNOW_ANGLED_4 || l0Tile == RED_ARROW_BIG_1 || l0Tile == RED_ARROW_BIG_2 || l0Tile == BLUE_ARROW_BIG_1 || l0Tile == BLUE_ARROW_BIG_2);
+
+        // Place the player to this potentially safe spot
+        guyData.guyX+= dir;
+
+        // If reached the edge, move back to original X and check the other direction for safe spots
+        if (guyData.guyX>639) {
+            guyData.guyX = orgX;
+            if (dir < 0) {
+                // No safe spot found, just move up
+                break;   
+            }
+            dir *= -1;
+        }
+    } while(1);
     
     guyData.guyMoveX = 0;
 
@@ -161,6 +172,7 @@ void main() {
     unsigned char course;
     unsigned char runsUntilFinish, courseCount = 1;
     unsigned char flagNum;
+    unsigned char save[MAPBASE_TILE_WIDTH*2];
 
     FlagTrackingList *flagsCurrent = 0, *flagsNext = 0;
 
@@ -238,18 +250,24 @@ void main() {
                 if (l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
                     l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK) {
                    
-                    // Move player to a safe space to continue
+                    // We will move the player to a safe space to continue
+                    // Show ouch msg and restore tiles
+                    messageCenterSave("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode, save);
                     waitCount(120);
+                    restoreRow(save, 7, 15, scrollY, zoomMode);
+
+                    // Back up and find a safe spot for the player to continue
                     getSafeSpot();
                     inSnow = 0;
                     scrollSpeed = 0;
+
                     // Move the player into positon
                     move(&guyData, scrollX, &scrollSpeed, inSnow);
                     setScroll();
                     totalTicks+= CRASH_PENALTY_TICKS;
+                    
                     // Update all the timer segments from the new totalTicks
                     refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
-
                     waitCount(120);
                 }
             }
