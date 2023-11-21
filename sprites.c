@@ -4,7 +4,13 @@
 #include "sprites.h"
 #include "config.h"
 
-signed char pushCount = 0, pushDir = 0;
+// While trying to turn left/right, how many frames before the X move changes
+#define FRAMES_PER_GUY_TURN 8
+
+// If the player is not at max speed, it takes a few frames to accelerate
+#define FRAMES_TO_ACCELERATE 20
+
+signed char pushCount = 0, pushDir = 0, scrollCount = 0;
 
 void spriteText(unsigned char* msg, unsigned char row) {
     unsigned short i, tile;
@@ -119,6 +125,8 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
 
     joy = joy_read(0);
 
+    // While holding L/R to turn guy, track how many frames the player holds L/R
+    // We don't want to turn them more until FRAMES_PER_GUY_TURN have past
     if (JOY_LEFT(joy)) {
         if (pushDir != -1) {
             pushDir = -1;
@@ -136,38 +144,54 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
         pushCount = 0;
     }
 
-    if (pushCount == 7) {
+    // See if enough frames have past to turn the guy more
+    if (pushCount >= FRAMES_PER_GUY_TURN) {
         guyData->guyMoveX += pushDir;
         pushCount = 0;
     }
 
-    if (guyData->guyMoveX > 4) {
-        guyData->guyMoveX = 4;
-    } else if (guyData->guyMoveX < -4) {
-        guyData->guyMoveX = -4;
+    // Limit the X move to 2 pixels per frame
+    if (guyData->guyMoveX > 3) {
+        guyData->guyMoveX = 3;
+    } else if (guyData->guyMoveX < -3) {
+        guyData->guyMoveX = -3;
     }
 
-    if (guyData->guyMoveX == 4 || guyData->guyMoveX == -4) {
-        scrollMax = 0;
-    } else if (guyData->guyMoveX == 3 || guyData->guyMoveX == -3) {
+    // Move the guy
+    guyData->guyX+= guyData->guyMoveX;
+
+    // *** Downhill speed ***
+
+    // Deep snow always slows the player to their min speed
+    if (inSnow) {
         scrollMax = 1;
-    } else if (guyData->guyMoveX == 2 || guyData->guyMoveX == -2) {
-        scrollMax = inSnow ? 1 : 2;
-    } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
-        scrollMax = inSnow ? 1 : 3;
     } else {
-        scrollMax = inSnow ? 1 : 4;
+        // The sharper the player is turning, the slower their speed downhill
+        if (guyData->guyMoveX >= 2 || guyData->guyMoveX <= -2) {
+            scrollMax = 2;
+        } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
+            scrollMax = 3;
+        } else {
+            scrollMax = 4;
+        }
     }
-    
-    *scrollSpeed = scrollMax;
 
-    // Limit side move to 3 but slower downhill
-    if (guyData->guyMoveX == 4) {
-        guyData->guyX+= 3; 
-    } else if (guyData->guyMoveX == -4) {
-        guyData->guyX-= 3;
+    // At correct speed
+    if (*scrollSpeed == scrollMax) {
+        // just reset the counter so it is fresh when acceleration happens
+        scrollCount = 0;
+    } else if (*scrollSpeed > scrollMax) { 
+        // Over max speed, probably hit snow or turned
+        *scrollSpeed = scrollMax;
+        scrollCount = 0;
     } else {
-        guyData->guyX+= guyData->guyMoveX;
+        // Less than max speed...accelerate
+        // Takes some number of frames to hit next speed
+        scrollCount++;
+        if (scrollCount >= FRAMES_TO_ACCELERATE) {
+            scrollCount = 0;
+            *scrollSpeed = *scrollSpeed + 1;
+        }
     }
 
     // Update Sprite 1 X/Y Position

@@ -4,7 +4,7 @@ make:
 	$(CC) -O -o SKI.PRG -t cx16 main.c wait.c utils.c config.c course.c sprites.c scores.c
 
 run:
-	x16emur43/x16emu -prg SKI.PRG -run
+	x16emur46/x16emu -prg SKI.PRG -run
 
 ldtk:
 	node ldtk-convert.js

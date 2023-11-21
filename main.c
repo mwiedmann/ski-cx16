@@ -13,11 +13,14 @@
 #include "scores.h"
 
 #define MISSED_FLAG_PENALTY_TICKS 300
+#define CRASH_PENALTY_TICKS 600
+#define COLLISION_MOVE_BACK_PIXELS 64
 
 GuyData guyData;
 
 short scrollY = 0, previousScroll = 0, scrollX = 0;
 unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 0, gameMode = 1;
+unsigned short halfScrollLimit;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     unsigned char tileX, tileY;
@@ -45,6 +48,42 @@ void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
     VERA.address = tileAddr;
     VERA.address_hi = tileAddr>>16;
     *l1Tile = VERA.data0;
+}
+
+void getSafeSpot() {
+    unsigned char l0Tile = 0, l1Tile = 0;
+
+    // Move player a bit back after a collision
+    scrollY-= COLLISION_MOVE_BACK_PIXELS;
+    
+    // Start on left side.
+    guyData.guyX = 8;
+
+    // Go from left to right and find a safe tile for the player
+    do {
+        // Place the player to this potentially safe spot
+        guyData.guyX+= 16;
+        
+        getCollisionTiles(&l0Tile, &l1Tile);
+        if (guyData.guyX>639) {
+            break;
+        }
+    } while(
+        l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
+        l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK
+        ||
+        l0Tile == SNOW || l0Tile == SNOW_WITH_DOTS || l0Tile == SNOW_ANGLED_1 || l0Tile == SNOW_ANGLED_2 || l0Tile == SNOW_ANGLED_3 ||
+        l0Tile == SNOW_ANGLED_4 || l0Tile == RED_ARROW_BIG_1 || l0Tile == RED_ARROW_BIG_2 || l0Tile == BLUE_ARROW_BIG_1 || l0Tile == BLUE_ARROW_BIG_2);
+    
+    guyData.guyMoveX = 0;
+
+    // TODO: These are efficiency helpers on getCollisionTiles
+    // They need to be reset but this feels bad.
+    lastTileX = 0;
+    lastTileY = 0;
+
+    // Update the left/right scroll if needed
+    scrollX = zoomMode == 0 ? guyData.guyX - halfScrollLimit : 0;
 }
 
 void showTimer(unsigned char mins, unsigned char secs, unsigned char milli, unsigned char missed) {
@@ -117,7 +156,7 @@ void main() {
     unsigned char l0Tile;
     unsigned char l1Tile;
     unsigned char inSnow;
-    unsigned short scrollSpeed, scrollLimit, halfScrollLimit, totalTicks;
+    unsigned short scrollSpeed, scrollLimit, totalTicks;
     unsigned char mins, secs, ticks, milli, missed, madeIt;
     unsigned char course;
     unsigned char runsUntilFinish, courseCount = 1;
@@ -198,12 +237,20 @@ void main() {
                 // but its too much work to refactor the tileset now. If this becomes a bottleneck I'll do it!
                 if (l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
                     l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK) {
-                    finialTimerUpdate(ticks, &milli);
-                    showTimer(mins, secs, milli, missed);
-                    messageCenter("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode);
-                    waitCount(180);
-                    course = 0;
-                    break;
+                   
+                    // Move player to a safe space to continue
+                    waitCount(120);
+                    getSafeSpot();
+                    inSnow = 0;
+                    scrollSpeed = 0;
+                    // Move the player into positon
+                    move(&guyData, scrollX, &scrollSpeed, inSnow);
+                    setScroll();
+                    totalTicks+= CRASH_PENALTY_TICKS;
+                    // Update all the timer segments from the new totalTicks
+                    refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
+
+                    waitCount(120);
                 }
             }
 
