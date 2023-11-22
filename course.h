@@ -30,6 +30,9 @@
 #define BLUE_ARROW_BIG_1 35
 #define BLUE_ARROW_BIG_2 36
 
+#define JUMP_1 63
+#define JUMP_2 64
+
 typedef struct FlagData {
     unsigned char row;
     unsigned char tile1;

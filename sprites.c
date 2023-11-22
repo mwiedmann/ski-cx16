@@ -86,6 +86,25 @@ void timerSprites(unsigned char zoomMode, unsigned char show) {
     spriteText("            ", 1);
 }
 
+void shadowSprite(GuyData *guyData, unsigned char show) {
+    unsigned long spriteGraphicAddress = TILEBASE_ADDR + (108 * 256);
+    VERA.address = SPRITE_SHADOW_ADDR;
+    VERA.address_hi = SPRITE_SHADOW_ADDR>>16;
+    // Set the Increment Mode, turn on bit 4
+    VERA.address_hi |= 0b10000;
+
+    // Graphic address bits 12:5
+    VERA.data0 = spriteGraphicAddress>>5;
+    // 256 color mode, and graphic address bits 16:13
+    VERA.data0 = 0b10000000 | spriteGraphicAddress>>13;
+    VERA.data0 = guyData->guyX;
+    VERA.data0 = guyData->guyX>>8;
+    VERA.data0 = guyData->guyY+64;
+    VERA.data0 = (guyData->guyY+64)>>8;
+    VERA.data0 = show ? 0b00001000 : 0;
+    VERA.data0 = 0b01010000; // 16x16 pixel image
+}
+
 void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show) {
     // VRAM address for sprite 1 (this is fixed)
     unsigned long spriteGraphicAddress = TILEBASE_ADDR + (72 * 256);
@@ -93,6 +112,8 @@ void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show)
     guyData->guyY = 32;
     guyData->guyMoveX = 0;
     guyData->guyMoveY = 0;
+    guyData->jumping = 0;
+    guyData->jumpCount = 0;
 
     // Point to Sprite 1
     VERA.address = SPRITE1_ADDR;
@@ -116,45 +137,70 @@ void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show)
     timerSprites(zoomMode, show);
 }
 
+void moveSprite(unsigned long spriteAddr, unsigned short x, unsigned short y) {
+    // Update Sprite 1 X/Y Position
+    // Point to Sprite 1 byte 2
+    VERA.address = spriteAddr+2;
+    VERA.address_hi = spriteAddr>>16;
+    // Set the Increment Mode, turn on bit 4
+    VERA.address_hi |= 0b10000;
+    
+    // Set the X and Y values
+    VERA.data0 = x;
+    VERA.data0 = x>>8;
+    VERA.data0 = y;
+    VERA.data0 = y>>8;
+}
+
 void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow) {
     unsigned char joy;
     unsigned short scrollInc = 0, scrollMax;
     short moveMax;
 
-    moveMax = inSnow ? GUY_MOVE_X_SNOW_MAX : GUY_MOVE_X_MAX;
-
-    joy = joy_read(0);
-
-    // While holding L/R to turn guy, track how many frames the player holds L/R
-    // We don't want to turn them more until FRAMES_PER_GUY_TURN have past
-    if (JOY_LEFT(joy)) {
-        if (pushDir != -1) {
-            pushDir = -1;
-            pushCount = 0;
+    if (guyData->jumpCount > 0) {
+        guyData->jumpCount--;
+        if (guyData->jumpCount == 0) {
+            guyData->jumping = 0;
+            shadowSprite(guyData, 0);
         }
-        pushCount++;
-    } else if (JOY_RIGHT(joy)) {
-        if (pushDir != 1) {
-            pushDir = 1;
-            pushCount = 0;
-        }
-        pushCount++;
-    } else {
-        pushDir = 0;
-        pushCount = 0;
     }
 
-    // See if enough frames have past to turn the guy more
-    if (pushCount >= FRAMES_PER_GUY_TURN) {
-        guyData->guyMoveX += pushDir;
-        pushCount = 0;
-    }
+    if (!guyData->jumping) {
+        moveMax = inSnow ? GUY_MOVE_X_SNOW_MAX : GUY_MOVE_X_MAX;
 
-    // Limit the X move to 2 pixels per frame
-    if (guyData->guyMoveX > 3) {
-        guyData->guyMoveX = 3;
-    } else if (guyData->guyMoveX < -3) {
-        guyData->guyMoveX = -3;
+        joy = joy_read(0);
+
+        // While holding L/R to turn guy, track how many frames the player holds L/R
+        // We don't want to turn them more until FRAMES_PER_GUY_TURN have past
+        if (JOY_LEFT(joy)) {
+            if (pushDir != -1) {
+                pushDir = -1;
+                pushCount = 0;
+            }
+            pushCount++;
+        } else if (JOY_RIGHT(joy)) {
+            if (pushDir != 1) {
+                pushDir = 1;
+                pushCount = 0;
+            }
+            pushCount++;
+        } else {
+            pushDir = 0;
+            pushCount = 0;
+        }
+
+        // See if enough frames have past to turn the guy more
+        if (pushCount >= FRAMES_PER_GUY_TURN) {
+            guyData->guyMoveX += pushDir;
+            pushCount = 0;
+        }
+
+        // Limit the X move to 2 pixels per frame
+        if (guyData->guyMoveX > 3) {
+            guyData->guyMoveX = 3;
+        } else if (guyData->guyMoveX < -3) {
+            guyData->guyMoveX = -3;
+        }
     }
 
     // Move the guy
@@ -162,48 +208,39 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
 
     // *** Downhill speed ***
 
-    // Deep snow always slows the player to their min speed
-    if (inSnow) {
-        scrollMax = 1;
-    } else {
-        // The sharper the player is turning, the slower their speed downhill
-        if (guyData->guyMoveX >= 2 || guyData->guyMoveX <= -2) {
-            scrollMax = 2;
-        } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
-            scrollMax = 3;
+    if (!guyData->jumping) {
+        // Deep snow always slows the player to their min speed
+        if (inSnow) {
+            scrollMax = 1;
         } else {
-            scrollMax = 4;
+            // The sharper the player is turning, the slower their speed downhill
+            if (guyData->guyMoveX >= 2 || guyData->guyMoveX <= -2) {
+                scrollMax = 2;
+            } else if (guyData->guyMoveX == 1 || guyData->guyMoveX == -1) {
+                scrollMax = 3;
+            } else {
+                scrollMax = 4;
+            }
         }
-    }
 
-    // At correct speed
-    if (*scrollSpeed == scrollMax) {
-        // just reset the counter so it is fresh when acceleration happens
-        scrollCount = 0;
-    } else if (*scrollSpeed > scrollMax) { 
-        // Over max speed, probably hit snow or turned
-        *scrollSpeed = scrollMax;
-        scrollCount = 0;
-    } else {
-        // Less than max speed...accelerate
-        // Takes some number of frames to hit next speed
-        scrollCount++;
-        if (scrollCount >= FRAMES_TO_ACCELERATE) {
+        // At correct speed
+        if (*scrollSpeed == scrollMax) {
+            // just reset the counter so it is fresh when acceleration happens
             scrollCount = 0;
-            *scrollSpeed = *scrollSpeed + 1;
+        } else if (*scrollSpeed > scrollMax) { 
+            // Over max speed, probably hit snow or turned
+            *scrollSpeed = scrollMax;
+            scrollCount = 0;
+        } else {
+            // Less than max speed...accelerate
+            // Takes some number of frames to hit next speed
+            scrollCount++;
+            if (scrollCount >= FRAMES_TO_ACCELERATE) {
+                scrollCount = 0;
+                *scrollSpeed = *scrollSpeed + 1;
+            }
         }
     }
 
-    // Update Sprite 1 X/Y Position
-    // Point to Sprite 1 byte 2
-    VERA.address = SPRITE1_ADDR+2;
-    VERA.address_hi = SPRITE1_ADDR>>16;
-    // Set the Increment Mode, turn on bit 4
-    VERA.address_hi |= 0b10000;
-    
-    // Set the X and Y values
-    VERA.data0 = guyData->guyX-scrollX;
-    VERA.data0 = (guyData->guyX-scrollX)>>8;
-    VERA.data0 = guyData->guyY;
-    VERA.data0 = guyData->guyY>>8;
+    moveSprite(SPRITE1_ADDR, guyData->guyX-scrollX, guyData->guyY);
 }

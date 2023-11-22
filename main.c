@@ -243,42 +243,52 @@ void main() {
             // Get the tiles on each layer the guy is currently touching
             getCollisionTiles(&l0Tile, &l1Tile);
 
-            // Check for collision with tree bases/stumps/bushes/poles
-            if (l1Tile) {
-                // YES - It would be better if these tiles were together in the tileset so I could just do (l1Tile >= X & l1Tile <= Y)
-                // but its too much work to refactor the tileset now. If this becomes a bottleneck I'll do it!
-                if (l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
-                    l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK) {
-                   
-                    // We will move the player to a safe space to continue
-                    // Show ouch msg and restore tiles
-                    messageCenterSave("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode, save);
-                    waitCount(120);
-                    restoreRow(save, 7, 15, scrollY, zoomMode);
-
-                    // Back up and find a safe spot for the player to continue
-                    getSafeSpot();
-                    inSnow = 0;
-                    scrollSpeed = 0;
-
-                    // Move the player into positon
-                    move(&guyData, scrollX, &scrollSpeed, inSnow);
-                    setScroll();
-                    totalTicks+= CRASH_PENALTY_TICKS;
-                    
-                    // Update all the timer segments from the new totalTicks
-                    refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
-                    waitCount(120);
+            if (!guyData.jumping) {
+                if (l0Tile == JUMP_1 || l0Tile == JUMP_2) {
+                    guyData.jumping = 1;
+                    guyData.jumpCount = 60;
+                    shadowSprite(&guyData, 1);
                 }
-            }
 
-            // Check if on course or in heavy snow...changes speed
-            // YES - It would also be better if these tiles were together....sigh
-            if (l0Tile == SNOW || l0Tile == SNOW_WITH_DOTS || l0Tile == SNOW_ANGLED_1 || l0Tile == SNOW_ANGLED_2 || l0Tile == SNOW_ANGLED_3 ||
-                l0Tile == SNOW_ANGLED_4 || l0Tile == RED_ARROW_BIG_1 || l0Tile == RED_ARROW_BIG_2 || l0Tile == BLUE_ARROW_BIG_1 || l0Tile == BLUE_ARROW_BIG_2) {
-                inSnow = 1;
+                // Check for collision with tree bases/stumps/bushes/poles
+                if (l1Tile) {
+                    // YES - It would be better if these tiles were together in the tileset so I could just do (l1Tile >= X & l1Tile <= Y)
+                    // but its too much work to refactor the tileset now. If this becomes a bottleneck I'll do it!
+                    if (l1Tile == RED_NET || l1Tile == BLUE_NET || l1Tile == GREEN_TREE_BASE || l1Tile == DEAD_TREE_BASE || l1Tile == GREEN_MINI_TREE ||
+                        l1Tile == GREEN_MINI_DEAD_TREE || l1Tile == STUMP || l1Tile == POLE || l1Tile == ROCK) {
+                    
+                        // We will move the player to a safe space to continue
+                        // Show ouch msg and restore tiles
+                        messageCenterSave("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode, save);
+                        waitCount(120);
+                        restoreRow(save, 7, 15, scrollY, zoomMode);
+
+                        // Back up and find a safe spot for the player to continue
+                        getSafeSpot();
+                        inSnow = 0;
+                        scrollSpeed = 0;
+
+                        // Move the player into positon
+                        move(&guyData, scrollX, &scrollSpeed, inSnow);
+                        setScroll();
+                        totalTicks+= CRASH_PENALTY_TICKS;
+                        
+                        // Update all the timer segments from the new totalTicks
+                        refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
+                        waitCount(120);
+                    }
+                }
+
+                // Check if on course or in heavy snow...changes speed
+                // YES - It would also be better if these tiles were together....sigh
+                if (l0Tile == SNOW || l0Tile == SNOW_WITH_DOTS || l0Tile == SNOW_ANGLED_1 || l0Tile == SNOW_ANGLED_2 || l0Tile == SNOW_ANGLED_3 ||
+                    l0Tile == SNOW_ANGLED_4 || l0Tile == RED_ARROW_BIG_1 || l0Tile == RED_ARROW_BIG_2 || l0Tile == BLUE_ARROW_BIG_1 || l0Tile == BLUE_ARROW_BIG_2) {
+                    inSnow = 1;
+                } else {
+                    inSnow = 0;
+                }
             } else {
-                inSnow = 0;
+                moveSprite(SPRITE_SHADOW_ADDR, guyData.guyX, guyData.guyY+guyData.jumpCount);
             }
 
             // Check flags
