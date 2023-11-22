@@ -288,16 +288,18 @@ void main() {
                     inSnow = 0;
                 }
             } else {
-                moveSprite(SPRITE_SHADOW_ADDR, guyData.guyX, guyData.guyY+guyData.jumpCount);
+                moveSprite(SPRITE_SHADOW_ADDR, guyData.guyX-scrollX, guyData.guyY+guyData.jumpCount);
             }
 
             // Check flags
             if (gameMode != GAME_MODE_FREE) {
                 if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
                     if (flagsCurrent->trackingData[flagNum].data.tile1 != 21 && flagsCurrent->trackingData[flagNum].data.tile1 != 22) {
+                        // Extra flags that we don't care about in this mode
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                     } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                        message("MISSED", 3, flagsCurrent->trackingData[flagNum].data.col1, 0, scrollY);
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                         missed++;
@@ -305,7 +307,7 @@ void main() {
                         // Time penalty
                         totalTicks+= MISSED_FLAG_PENALTY_TICKS;
                         // Update all the timer segments from the new totalTicks
-                        refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli); 
+                        refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
                     } else if (
                         (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
                         (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
