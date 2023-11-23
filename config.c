@@ -134,7 +134,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
 
         if (JOY_UP(joy) || JOY_DOWN(joy)) {
             *gameMode+=1;
-            if (*gameMode == 2) {
+            if (*gameMode == 3) {
                 *gameMode = 0;
             }
 
@@ -159,7 +159,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
         messageCenter("SKI AROUND FLAGS", 11, 14, 0, 0, 1);
         
         messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 16, 0, 0, 1);
-        messageCenter("COMING SOON!", 14, 17, 0, 0, 1);
+        messageCenter("SKI BETWEEN FLAGS", 14, 17, 0, 0, 1);
 
         messageCenter("THERE IS A 5 SEC TIME", 16, 19, 0, 0, 1);
         messageCenter("PENALTY FOR MISSING", 17, 20, 0, 0, 1);

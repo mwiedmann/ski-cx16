@@ -15,6 +15,11 @@
 #define MISSED_FLAG_PENALTY_TICKS 300
 #define CRASH_PENALTY_TICKS 600
 #define COLLISION_MOVE_BACK_PIXELS 64
+#define JUMP_COUNT 60
+#define RED_GATE 9
+#define BLUE_GATE 10
+#define RED_FLAG 21
+#define BLUE_FLAG 22
 
 GuyData guyData;
 
@@ -246,7 +251,7 @@ void main() {
             if (!guyData.jumping) {
                 if (l0Tile == JUMP_1 || l0Tile == JUMP_2) {
                     guyData.jumping = 1;
-                    guyData.jumpCount = 60;
+                    guyData.jumpCount = JUMP_COUNT;
                     shadowSprite(&guyData, 1);
                 }
 
@@ -292,9 +297,9 @@ void main() {
             }
 
             // Check flags
-            if (gameMode != GAME_MODE_FREE) {
+            if (gameMode == GAME_MODE_FLAGS) {
                 if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
-                    if (flagsCurrent->trackingData[flagNum].data.tile1 != 21 && flagsCurrent->trackingData[flagNum].data.tile1 != 22) {
+                    if (flagsCurrent->trackingData[flagNum].data.tile1 != RED_FLAG && flagsCurrent->trackingData[flagNum].data.tile1 != BLUE_FLAG) {
                         // Extra flags that we don't care about in this mode
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
@@ -309,8 +314,33 @@ void main() {
                         // Update all the timer segments from the new totalTicks
                         refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
                     } else if (
-                        (flagsCurrent->trackingData[flagNum].data.tile1 == 21 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
-                        (flagsCurrent->trackingData[flagNum].data.tile1 == 22 && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
+                        (flagsCurrent->trackingData[flagNum].data.tile1 == RED_FLAG && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
+                        (flagsCurrent->trackingData[flagNum].data.tile1 == BLUE_FLAG && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
+                        ) {
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                    }
+                }
+            } else if (gameMode == GAME_MODE_GATES) {
+                if (flagNum < flagsCurrent->length && !flagsCurrent->trackingData[flagNum].tracked) {
+                    if (flagsCurrent->trackingData[flagNum].data.tile1 != RED_GATE && flagsCurrent->trackingData[flagNum].data.tile1 != BLUE_GATE) {
+                        // Extra flags that we don't care about in this mode
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                    } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                        message("MISSED", 3, flagsCurrent->trackingData[flagNum].data.col2, 0, scrollY);
+                        flagsCurrent->trackingData[flagNum].tracked = 1;
+                        flagNum++;
+                        missed++;
+
+                        // Time penalty
+                        totalTicks+= MISSED_FLAG_PENALTY_TICKS;
+                        // Update all the timer segments from the new totalTicks
+                        refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
+                    } else if (
+                        (lastTileY == flagsCurrent->trackingData[flagNum].data.row &&
+                         lastTileX >= flagsCurrent->trackingData[flagNum].data.col1 &&
+                         lastTileX <= flagsCurrent->trackingData[flagNum].data.col2)
                         ) {
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;

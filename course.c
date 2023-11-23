@@ -9,10 +9,12 @@ void loadCourses() {
     loadFileToBankedRAM("c0l0.bin", C0_L0_BANK, 0);
     loadFileToBankedRAM("c0l1.bin", C0_L1_BANK, 0);
     loadFileToBankedRAM("c0flags.bin", FLAGS_BANK, 0);
+    loadFileToBankedRAM("c0gates.bin", GATES_BANK, 0);
 
     loadFileToBankedRAM("c1l0.bin", C1_L0_BANK, 0);
     loadFileToBankedRAM("c1l1.bin", C1_L1_BANK, 0);
     loadFileToBankedRAM("c1flags.bin", FLAGS_BANK, FLAG_BANK_SIZE);
+    loadFileToBankedRAM("c1gates.bin", GATES_BANK, FLAG_BANK_SIZE);
 
     loadFileToBankedRAM("c15l0.bin", CFINISH_L0_BANK, 0);
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
@@ -25,7 +27,7 @@ FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half, uns
     FlagData *flagData;
     FlagTrackingList *flagTrackingList;
 
-    BANK_NUM = FLAGS_BANK;
+    BANK_NUM = gameMode == GAME_MODE_FLAGS ? FLAGS_BANK : GATES_BANK;
 
     bankAddr = ((unsigned short)BANK_RAM) + (course * FLAG_BANK_SIZE);
     len = (*(unsigned char*)(bankAddr));
