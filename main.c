@@ -24,7 +24,7 @@
 GuyData guyData;
 
 short scrollY = 0, previousScroll = 0, scrollX = 0;
-unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 0, gameMode = 1;
+unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 1, gameMode = 1;
 unsigned short halfScrollLimit;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
@@ -174,7 +174,7 @@ void main() {
     unsigned char inSnow;
     unsigned short scrollSpeed, scrollLimit, totalTicks;
     unsigned char mins, secs, ticks, milli, missed, madeIt;
-    unsigned char course;
+    unsigned char course, selectedCourse = 0;
     unsigned char runsUntilFinish, courseCount = 1;
     unsigned char flagNum;
     unsigned char save[MAPBASE_TILE_WIDTH*2];
@@ -198,8 +198,10 @@ void main() {
         spritesConfig(&guyData, 0, 0); // hide sprites
 
         // Pick the game and graphics mode and set the zoom level accordingly
-        pickModes(&zoomMode, &gameMode, &courseCount);
-
+        course = selectedCourse;
+        pickModes(&zoomMode, &gameMode, &courseCount, &course);
+        selectedCourse = course;
+        
         // Set the zoom level
         clearLayers();
         setZoom(zoomMode);
@@ -207,7 +209,6 @@ void main() {
         // Show the high scores for this mode
         displayScores(zoomMode, gameMode, courseCount, scrollX, scrollY, 65535U);
 
-        course = 0; // Starting course
         runsUntilFinish = courseCount; // How many courses until the finish line
         inSnow = 0;
 
