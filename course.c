@@ -16,6 +16,11 @@ void loadCourses() {
     loadFileToBankedRAM("c1flags.bin", FLAGS_BANK, FLAG_BANK_SIZE);
     loadFileToBankedRAM("c1gates.bin", GATES_BANK, FLAG_BANK_SIZE);
 
+    loadFileToBankedRAM("c2l0.bin", C2_L0_BANK, 0);
+    loadFileToBankedRAM("c2l1.bin", C2_L1_BANK, 0);
+    loadFileToBankedRAM("c2flags.bin", FLAGS_BANK, FLAG_BANK_SIZE*2);
+    loadFileToBankedRAM("c2gates.bin", GATES_BANK, FLAG_BANK_SIZE*2);
+
     loadFileToBankedRAM("c15l0.bin", CFINISH_L0_BANK, 0);
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
 }

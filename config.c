@@ -80,6 +80,17 @@ void clearLayers() {
     clearLayer1();
 }
 
+void showCourseRow(unsigned char courseCount, unsigned char thisCourse, unsigned char selectedCourse, unsigned char row) {
+    messageCenter(courseCount != thisCourse
+        ? " A   B   C "
+        : selectedCourse == 0
+            ? "-A-  B   C "
+            : selectedCourse == 1
+                ? " A  -B-  C "
+                : " A   B  -C-",
+            row, row, 0, 0, 1);
+}
+
 void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount, unsigned char *course) {
     unsigned char joy;
 
@@ -202,14 +213,27 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
             }
         }
 
-        if (JOY_LEFT(joy) || JOY_RIGHT(joy)) {
+        if (JOY_LEFT(joy)) {
             if (*course == 0) {
-                *course = 1;
+                *course = 2;
             } else {
-                *course = 0;
+                *course-=1;
             }
 
-            while(JOY_LEFT(joy) || JOY_RIGHT(joy)) {
+            while(JOY_LEFT(joy)) {
+                wait();
+                joy = joy_read(0);
+            }
+        }
+
+        if (JOY_RIGHT(joy)) {
+            if (*course == 2) {
+                *course = 0;
+            } else {
+                *course+=1;
+            }
+
+            while(JOY_RIGHT(joy)) {
                 wait();
                 joy = joy_read(0);
             }
@@ -224,16 +248,16 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
         }
 
         messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 8, 9, 0, 0, 1);
-        messageCenter((*courseCount) != 1 ? " A   B " : (*course) == 0 ? "-A-  B " : " A  -B-", 9, 10, 0, 0, 1);
+        showCourseRow(*courseCount, 1, *course, 10);
 
         messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 11, 12, 0, 0, 1);
-        messageCenter((*courseCount) != 2 ? " A   B " : (*course) == 0 ? "-A-  B " : " A  -B-", 12, 13, 0, 0, 1);
+        showCourseRow(*courseCount, 2, *course, 13);
         
         messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 14, 15, 0, 0, 1);
-        messageCenter((*courseCount) != 3 ? " A   B " : (*course) == 0 ? "-A-  B " : " A  -B-", 15, 16, 0, 0, 1);
+        showCourseRow(*courseCount, 3, *course, 16);
 
         messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 17, 18, 0, 0, 1);
-        messageCenter((*courseCount) != 4 ? " A   B " : (*course) == 0 ? "-A-  B " : " A  -B-", 18, 19, 0, 0, 1);
+        showCourseRow(*courseCount, 4, *course, 19);
 
         wait();
     }

@@ -37,7 +37,11 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
                 ? "MEDIUM"
                 : courseCount == 3
                     ? "LONG" : "EPIC",
-        gameMode == GAME_MODE_FREE ? "FREE" : "FLAGS");
+        gameMode == GAME_MODE_FREE
+            ? "FREE"
+            : gameMode == GAME_MODE_FLAGS
+                ? "FLAGS"
+                : "GATES");
 
     messageCenter(buf, 0, 6, scrollX, scrollY, zoomMode);
     messageCenter("HIGH SCORES", 1, 7, scrollX, scrollY, zoomMode);
