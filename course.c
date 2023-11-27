@@ -97,6 +97,11 @@ FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, u
             l1bank = C1_L1_BANK;
             break;
 
+        case 2 :
+            l0bank = C2_L0_BANK;
+            l1bank = C2_L1_BANK;
+            break;
+
         case 15 :
             l0bank = CFINISH_L0_BANK;
             l1bank = CFINISH_L1_BANK;
