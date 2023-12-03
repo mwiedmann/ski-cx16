@@ -3,7 +3,7 @@
 
 typedef struct Score {
     unsigned short ticks;
-    unsigned char name[4];
+    char name[4];
 } Score;
 
 typedef struct ScoreList {

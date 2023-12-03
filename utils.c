@@ -4,7 +4,7 @@
 #include "utils.h"
 #include "config.h"
 
-void loadFileToVRAM(unsigned char *filename, unsigned long addr) {
+void loadFileToVRAM(char *filename, unsigned long addr) {
     // These 3 functions are basic wrappers for the Kernal Functions
 
     // You have to first set the name of the file you are working with.
@@ -32,7 +32,7 @@ void loadFileToVRAM(unsigned char *filename, unsigned long addr) {
     cbm_k_load(addr > 0xFFFFL ? 3 : 2, addr);
 }
 
-void loadFileToBankedRAM(unsigned char *filename, unsigned char bank, unsigned short addr) {
+void loadFileToBankedRAM(char *filename, unsigned char bank, unsigned short addr) {
     // Set the RAM Bank we are loading into
     BANK_NUM = bank;
 
@@ -79,7 +79,7 @@ void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, uns
     }
 }
 
-void restoreRow(unsigned char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode) {
+void restoreRow(char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode) {
     unsigned short i;
     unsigned char row = zoomMode == 0 ? row0 : row1;
     unsigned long addr = L1_MAPBASE_ADDR + (((scrollY>>4) + row) * MAPBASE_TILE_WIDTH * 2);
@@ -95,11 +95,11 @@ void restoreRow(unsigned char* save, unsigned char row0, unsigned char row1, uns
     }
 }
 
-void message(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY) {
+void message(char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY) {
     messageSave(msg, row, col, scrollX, scrollY, 0);
 }
 
-void messageSave(unsigned char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY, unsigned char* save) {
+void messageSave(char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY, char* save) {
     unsigned short i, tile;
     unsigned long addr;
 
@@ -162,11 +162,11 @@ void messageSave(unsigned char* msg, unsigned char row, unsigned char col, unsig
     }
 }
 
-void messageCenter(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode) {
+void messageCenter(char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode) {
     messageCenterSave(msg, row0, row1, scrollX, scrollY, zoomMode, 0);
 }
 
-void messageCenterSave(unsigned char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode, unsigned char* save) {
+void messageCenterSave(char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode, char* save) {
     unsigned char len, col;
     unsigned char offset = zoomMode == 1 ? 41 : 21;
     len = strlen(msg);

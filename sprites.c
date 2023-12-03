@@ -12,7 +12,7 @@
 
 signed char pushCount = 0, pushDir = 0, scrollCount = 0;
 
-void spriteText(unsigned char* msg, unsigned char row) {
+void spriteText(char* msg, unsigned char row) {
     unsigned short i, tile;
 
     for (i=0; i<SPRITE_TEXT_COUNT; i++) {
@@ -189,7 +189,7 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
             pushCount = 0;
         }
 
-        // See if enough frames have past to turn the guy more
+        // See if enough frames have passed to turn the guy more
         if (pushCount >= FRAMES_PER_GUY_TURN) {
             guyData->guyMoveX += pushDir;
             pushCount = 0;

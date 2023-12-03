@@ -6,8 +6,8 @@
 #include "wait.h"
 
 void init() {
-    unsigned char *tileFilename = "tilemap.bin";
-    unsigned char *palFilename = "tilemap.pal";
+    char *tileFilename = "tilemap.bin";
+    char *palFilename = "tilemap.pal";
 
     // Configure the joysticks
     joy_install(cx16_std_joy);

@@ -13,7 +13,7 @@
 void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount, unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
     unsigned short mins, secs, milli, ticks, mem;
     signed char b, i;
-    unsigned char buf[24];
+    char buf[24];
     unsigned char scoreRow = 99;
     unsigned char nameDone = 0, joy, nameCount = 0, nameChar = 'A';
     ScoreList scoreList;

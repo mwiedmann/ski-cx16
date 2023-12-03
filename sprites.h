@@ -24,7 +24,7 @@ typedef struct GuyData {
 void moveSprite(unsigned long spriteAddr, unsigned short x, unsigned short y);
 void shadowSprite(GuyData *guyData, unsigned char show);
 void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show);
-void spriteText(unsigned char* msg, unsigned char row);
+void spriteText(char* msg, unsigned char row);
 void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow);
 
 #endif

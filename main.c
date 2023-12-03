@@ -103,7 +103,7 @@ void getSafeSpot() {
 }
 
 void showTimer(unsigned char mins, unsigned char secs, unsigned char milli, unsigned char missed) {
-    unsigned char msg[24], buf[24];
+    char msg[24], buf[24];
 
     sprintf(buf, "%u:%02u.%02u", mins, secs, milli);
     sprintf(msg, "%12s", buf);
@@ -177,7 +177,7 @@ void main() {
     unsigned char course, selectedCourse = 0;
     unsigned char runsUntilFinish, courseCount = 1;
     unsigned char flagNum;
-    unsigned char save[MAPBASE_TILE_WIDTH*2];
+    char save[MAPBASE_TILE_WIDTH*2];
 
     FlagTrackingList *flagsCurrent = 0, *flagsNext = 0;
 
