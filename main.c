@@ -11,6 +11,7 @@
 #include "wait.h"
 #include "sprites.h"
 #include "scores.h"
+#include "sound.h"
 
 #define MISSED_FLAG_PENALTY_TICKS 300
 #define CRASH_PENALTY_TICKS 600
@@ -185,7 +186,11 @@ void main() {
     showTitle();
 
     loadCourses();
-    //waitCount(120);
+    // sound_loadMusic(1);
+    // waitCount(60); // Song stutters if we don't wait
+
+    // sound_playMusic(1);
+    // waitCount(60);
   
     while(1) {
         // Reset scrolling

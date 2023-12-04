@@ -1,7 +1,7 @@
 #ifndef COURSE_H
 #define COURSE_H
 
-#define COURSE_COUNT 3
+#define COURSE_COUNT 4
 
 #define FLAG_TYPE 1
 

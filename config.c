@@ -4,6 +4,7 @@
 #include "config.h"
 #include "utils.h"
 #include "wait.h"
+#include "sound.h"
 
 void init() {
     char *tileFilename = "tilemap.bin";
@@ -34,6 +35,8 @@ void init() {
 
     loadFileToVRAM(palFilename, PALETTE_ADDR);
     loadFileToVRAM(tileFilename, TILEBASE_ADDR);
+
+    sound_init();
 }
 
 void setZoom(unsigned char zoomMode) {
@@ -82,12 +85,14 @@ void clearLayers() {
 
 void showCourseRow(unsigned char courseCount, unsigned char thisCourse, unsigned char selectedCourse, unsigned char row) {
     messageCenter(courseCount != thisCourse
-        ? " A   B   C "
+        ? " A   B   C   D "
         : selectedCourse == 0
-            ? "-A-  B   C "
+            ? "-A-  B   C   D "
             : selectedCourse == 1
-                ? " A  -B-  C "
-                : " A   B  -C-",
+                ? " A  -B-  C   D "
+                : selectedCourse == 2
+                    ? " A   B  -C-  D "
+                    : " A   B   C  -D-",
             row, row, 0, 0, 1);
 }
 
@@ -215,7 +220,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
 
         if (JOY_LEFT(joy)) {
             if (*course == 0) {
-                *course = 2;
+                *course = 3;
             } else {
                 *course-=1;
             }
@@ -227,7 +232,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
         }
 
         if (JOY_RIGHT(joy)) {
-            if (*course == 2) {
+            if (*course == 3) {
                 *course = 0;
             } else {
                 *course+=1;

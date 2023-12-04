@@ -1,7 +1,7 @@
 CC=cl65
 
 make:
-	$(CC) -O -o SKI.PRG -t cx16 main.c wait.c utils.c config.c course.c sprites.c scores.c
+	$(CC) --cpu 65C02 -Or -Cl -C cx16.cfg -o SKI.PRG -t cx16 main.c wait.c utils.c config.c course.c sprites.c scores.c sound.c zsmkit.lib
 
 run:
 	x16emur46/x16emu -prg SKI.PRG -run

@@ -21,6 +21,11 @@ void loadCourses() {
     loadFileToBankedRAM("c2flags.bin", FLAGS_BANK, FLAG_BANK_SIZE*2);
     loadFileToBankedRAM("c2gates.bin", GATES_BANK, FLAG_BANK_SIZE*2);
 
+    loadFileToBankedRAM("c3l0.bin", C3_L0_BANK, 0);
+    loadFileToBankedRAM("c3l1.bin", C3_L1_BANK, 0);
+    loadFileToBankedRAM("c3flags.bin", FLAGS_BANK, FLAG_BANK_SIZE*3);
+    loadFileToBankedRAM("c3gates.bin", GATES_BANK, FLAG_BANK_SIZE*3);
+
     loadFileToBankedRAM("c15l0.bin", CFINISH_L0_BANK, 0);
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
 }
@@ -100,6 +105,11 @@ FlagTrackingList * drawPartialCourse(unsigned char course, unsigned char half, u
         case 2 :
             l0bank = C2_L0_BANK;
             l1bank = C2_L1_BANK;
+            break;
+
+        case 3 :
+            l0bank = C3_L0_BANK;
+            l1bank = C3_L1_BANK;
             break;
 
         case 15 :
