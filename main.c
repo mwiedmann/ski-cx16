@@ -17,8 +17,6 @@
 #define CRASH_PENALTY_TICKS 600
 #define COLLISION_MOVE_BACK_PIXELS 64
 #define JUMP_COUNT 60
-#define RED_GATE 9
-#define BLUE_GATE 10
 #define RED_FLAG 21
 #define BLUE_FLAG 22
 

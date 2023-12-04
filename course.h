@@ -16,6 +16,9 @@
 #define POLE 67
 #define ROCK 82
 
+#define RED_GATE 9
+#define BLUE_GATE 10
+
 // Heavy snow tiles
 #define SNOW 1
 #define SNOW_WITH_DOTS 6

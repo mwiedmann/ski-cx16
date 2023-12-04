@@ -55,24 +55,34 @@ const createLevelCode = (levelNum, level) => {
 
   const addGates = (gridTiles) => {
     const bytes = [];
+    let length = 0;
+
     for (let i = 0; i < gridTiles.length; i++) {
+      length++;
       const g = gridTiles[i];
       bytes.push(parseInt(g.px[1] / 16)); // row
       bytes.push(g.t + 1); // tile1 - Add 1 because we have a blank tile before the loaded tiles
       bytes.push(parseInt(g.px[0] / 16)); // col1
+      // For gate flags, there should alwyas be a 2nd flag for the gate
       if (g.t == 8 || g.t == 9) {
         const g2 = gridTiles[i + 1];
         bytes.push(g2.t + 1); // tile2
         bytes.push(parseInt(g2.px[0] / 16)); // col2
         i++;
+      } else {
+        // This is not a gate flag, just add 0
+        bytes.push(0); // tile2
+        bytes.push(0); // col2
       }
     }
 
-    return bytes;
+    return { bytes, length };
   };
 
   level.layerInstances.forEach((li) => {
     let bytes = undefined;
+    let results
+
     switch (li.__identifier) {
       case "Layer_0":
         bytes = addTiles(li.gridTiles);
@@ -84,11 +94,11 @@ const createLevelCode = (levelNum, level) => {
         bytes = addFlags(li.gridTiles);
         break;
       case "Gates":
-        bytes = addGates(li.gridTiles);
+        results = addGates(li.gridTiles);
         break;
     }
 
-    if (bytes) {
+    if (bytes || results.bytes) {
       let outputFilename;
       let output;
 
@@ -97,7 +107,7 @@ const createLevelCode = (levelNum, level) => {
         output = new Uint8Array([li.gridTiles.length, ...bytes]);
       } else if (li.__identifier === "Gates") {
         outputFilename = `C${levelNum}GATES.BIN`;
-        output = new Uint8Array([li.gridTiles.length, ...bytes]);
+        output = new Uint8Array([results.length, ...results.bytes]);
       } else {
         const layerNum = li.__identifier.split("_")[1];
         outputFilename = `C${levelNum}L${layerNum}.BIN`;

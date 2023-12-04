@@ -73,7 +73,7 @@ FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half, uns
         VERA.data0 = 0;
 
         // Display both tiles if this is a gate
-        if (gameMode == GAME_MODE_GATES) {
+        if (gameMode == GAME_MODE_GATES && (flagData[i].tile1 == RED_GATE || flagData[i].tile1 == BLUE_GATE)) {
             addr = L1_MAPBASE_ADDR + (flagData[i].row * MAPBASE_TILE_WIDTH * 2) + (flagData[i].col2 * 2);
             VERA.address =  addr;
             VERA.address_hi = L1_MAPBASE_ADDR>>16;
