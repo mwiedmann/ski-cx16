@@ -119,6 +119,8 @@ void showTitle() {
     // Requires 640 mode
     setZoom(1);
 
+    showTitleBackground();
+
     messageCenter("WELCOME TO SKIING", 6, 13, scrollX, scrollY, 1);
     messageCenter("BY MARK WIEDMANN", 7, 14, scrollX, scrollY, 1);
     messageCenter("LOADING COURSES...", 9, 16, scrollX, scrollY, 1);
@@ -205,12 +207,11 @@ void main() {
         pickModes(&zoomMode, &gameMode, &courseCount, &course);
         selectedCourse = course;
         
-        // Set the zoom level
-        clearLayers();
-        setZoom(zoomMode);
-
         // Show the high scores for this mode
-        displayScores(zoomMode, gameMode, courseCount, scrollX, scrollY, 65535U);
+        displayScores(zoomMode, gameMode, courseCount, selectedCourse, scrollX, scrollY, 65535U);
+
+        // Set the zoom level
+        setZoom(zoomMode);
 
         runsUntilFinish = courseCount; // How many courses until the finish line
         inSnow = 0;
@@ -475,6 +476,6 @@ void main() {
         setScroll();
         clearLayers();
         spritesConfig(&guyData, 0, 0); // hide sprites
-        displayScores(zoomMode, gameMode, courseCount, scrollX, scrollY, madeIt ? totalTicks : 65535U);
+        displayScores(zoomMode, gameMode, courseCount, selectedCourse, scrollX, scrollY, madeIt ? totalTicks : 65535U);
     }
 }

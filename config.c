@@ -78,6 +78,11 @@ void clearLayer1() {
     }
 }
 
+void showTitleBackground() {
+    loadFileToVRAM("c16l0.bin", L0_MAPBASE_ADDR);
+    loadFileToVRAM("c16l1.bin", L1_MAPBASE_ADDR); 
+}
+
 void clearLayers() {
     clearLayer0();
     clearLayer1();
@@ -99,7 +104,7 @@ void showCourseRow(unsigned char courseCount, unsigned char thisCourse, unsigned
 void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount, unsigned char *course) {
     unsigned char joy;
 
-    clearLayers();
+    showTitleBackground();
     
     // Requires 640 mode
     setZoom(1);
@@ -141,7 +146,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     }
 
     // Pick game mode
-    clearLayers();
+    showTitleBackground();
     messageCenter("CHOOSE GAME MODE", 5, 7, 0, 0, 1);
     messageCenter("USE JOYSTICK TO SELECT", 6, 8, 0, 0, 1);
 
@@ -186,10 +191,10 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     }
 
     // Pick game mode
-    clearLayers();
-    messageCenter("COURSE SETTINGS", 5, 5, 0, 0, 1);
-    messageCenter("UP-DOWN FOR LENGTH", 6, 6, 0, 0, 1);
-    messageCenter("LFT-RGT FOR COURSE", 7, 7, 0, 0, 1);
+    showTitleBackground();
+    messageCenter("COURSE SETTINGS", 7, 7, 0, 0, 1);
+    messageCenter("UP-DOWN FOR LENGTH", 8, 8, 0, 0, 1);
+    messageCenter("LEFT-RIGHT FOR COURSE", 9, 9, 0, 0, 1);
 
     while (1) {
         joy = joy_read(0);
@@ -252,20 +257,22 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
             break;
         }
 
-        messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 8, 9, 0, 0, 1);
-        showCourseRow(*courseCount, 1, *course, 10);
+        messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 11, 11, 0, 0, 1);
+        showCourseRow(*courseCount, 1, *course, 12);
 
-        messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 11, 12, 0, 0, 1);
-        showCourseRow(*courseCount, 2, *course, 13);
+        messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 14, 14, 0, 0, 1);
+        showCourseRow(*courseCount, 2, *course, 15);
         
-        messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 14, 15, 0, 0, 1);
-        showCourseRow(*courseCount, 3, *course, 16);
+        messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 17, 17, 0, 0, 1);
+        showCourseRow(*courseCount, 3, *course, 18);
 
-        messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 17, 18, 0, 0, 1);
-        showCourseRow(*courseCount, 4, *course, 19);
+        messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 20, 20, 0, 0, 1);
+        showCourseRow(*courseCount, 4, *course, 21);
 
         wait();
     }
+
+    showTitleBackground();
 }
 
 void waitForButtonPress() {

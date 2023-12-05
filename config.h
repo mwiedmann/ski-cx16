@@ -52,6 +52,7 @@
 
 void init();
 void setZoom(unsigned char zoomMode);
+void showTitleBackground();
 void clearLayers();
 void clearLayer0();
 void clearLayer1();

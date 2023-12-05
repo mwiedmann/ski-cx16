@@ -10,8 +10,9 @@
 
 #define KEY_DELAY 10
 
-void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount, unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
-    unsigned short mins, secs, milli, ticks, mem;
+void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount, unsigned char startingCourse,
+    unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
+    unsigned short mins, secs, milli, ticks, mem=0;
     signed char b, i;
     char buf[24];
     unsigned char scoreRow = 99;
@@ -20,17 +21,25 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
 
     BANK_NUM = SCORE_BANK;
 
-    sprintf(buf, "score%u%u.bin", gameMode, courseCount);
+    sprintf(buf, "score%u%u%u.bin", gameMode, courseCount, startingCourse);
 
     cbm_k_setnam(buf);
     cbm_k_setlfs(0, 8, 0); // has 2 byte header because cbm_k_save will add it
 
     // Reminder, first param of cbm_k_load of "0" means load into system memory.
     mem = cbm_k_load(0, (unsigned short)BANK_RAM);
+
+    // If score file doesn't exist, load the default scores
+    if (mem == (unsigned short)BANK_RAM) {
+        cbm_k_setnam("score.bin");
+        cbm_k_setlfs(0, 8, 0);
+        mem = cbm_k_load(0, (unsigned short)BANK_RAM);
+    }
+
     scoreList.length = (mem - ((unsigned short)BANK_RAM)) / sizeof(Score);
     scoreList.scores = (Score*)BANK_RAM;
 
-    sprintf(buf, "%s-%s",
+    sprintf(buf, "%s-%s-%s",
         courseCount == 1
             ? "SHORT"
             : courseCount == 2
@@ -41,7 +50,14 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
             ? "FREE"
             : gameMode == GAME_MODE_FLAGS
                 ? "FLAGS"
-                : "GATES");
+                : "GATES",
+        startingCourse == 0
+            ? "A"
+            : startingCourse == 1
+                ? "B"
+                : startingCourse == 2
+                    ? "C"
+                    : "D");
 
     messageCenter(buf, 0, 6, scrollX, scrollY, zoomMode);
     messageCenter("HIGH SCORES", 1, 7, scrollX, scrollY, zoomMode);
@@ -123,7 +139,7 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
     // Save the new list
     if (scoreRow != 99) {
         // NOTE: the "@:" prefix allows us to overwrite a file
-        sprintf(buf, "@:score%u%u.bin", gameMode, courseCount);
+        sprintf(buf, "@:score%u%u%u.bin", gameMode, courseCount, startingCourse);
         cbm_k_setnam(buf);
         // SAVE adds the 2 byte header and we can't stop it
         cbm_k_setlfs(0, 8, 0);
