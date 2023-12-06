@@ -85,6 +85,11 @@ void showTitleBackground() {
     loadFileToVRAM("c16l1.bin", L1_MAPBASE_ADDR); 
 }
 
+void showInstructionsBackground() {
+    loadFileToVRAM("c17l0.bin", L0_MAPBASE_ADDR);
+    loadFileToVRAM("c17l1.bin", L1_MAPBASE_ADDR); 
+}
+
 void clearLayers() {
     clearLayer0();
     clearLayer1();
@@ -179,7 +184,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
         messageCenter("SKI AROUND FLAGS", 11, 14, 0, 0, 1);
         
         messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 16, 0, 0, 1);
-        messageCenter("SKI BETWEEN FLAGS", 14, 17, 0, 0, 1);
+        messageCenter("SKI BETWEEN GATES", 14, 17, 0, 0, 1);
 
         messageCenter("THERE IS A TIME", 16, 19, 0, 0, 1);
         messageCenter("PENALTY FOR CRASHES", 17, 20, 0, 0, 1);
@@ -255,6 +260,9 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
 
         wait();
     }
+
+    showInstructionsBackground();
+    waitForButtonPress();
 
     showTitleBackground();
 }

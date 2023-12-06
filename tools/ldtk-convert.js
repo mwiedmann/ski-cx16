@@ -91,9 +91,17 @@ const createLevelCode = (levelNum, level) => {
         bytes = addTiles(li.gridTiles, 0);
         break;
       case "Flags":
+        // "Levels" 16-17 don't have flags/gates
+        if (levelNum >= 16) {
+          return
+        }
         bytes = addFlags(li.gridTiles);
         break;
       case "Gates":
+        // "Levels" 16-17 don't have flags/gates
+        if (levelNum >= 16) {
+          return
+        }
         results = addGates(li.gridTiles);
         break;
     }
