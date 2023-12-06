@@ -55,6 +55,7 @@ typedef struct FlagTrackingList {
     FlagTrackingData trackingData[];
 } FlagTrackingList;
 
+unsigned char nextCourse(unsigned char courseCount, unsigned char selectedCourse, unsigned char *courseIndex);
 void loadCourses();
 FlagTrackingList* drawPartialCourse(unsigned char course, unsigned char half, unsigned char drawFlags, unsigned char gameMode);
 

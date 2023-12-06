@@ -5,6 +5,18 @@
 #include "config.h"
 #include "utils.h"
 
+unsigned char courseLayoutsMedium[4][3] = {
+    {0, 1}, {1, 2}, {2, 3}, {3, 0}
+};
+
+unsigned char courseLayoutsLong[4][3] = {
+    {0, 2, 3}, {1, 0, 2}, {2, 1, 3}, {3, 1, 0}
+};
+
+unsigned char courseLayoutsEpic[4][4] = {
+    {0, 2, 1, 3}, {1, 2, 0, 3}, {2, 0, 3, 1}, {3, 2, 1, 0}
+};
+
 void loadCourses() {
     loadFileToBankedRAM("c0l0.bin", C0_L0_BANK, 0);
     loadFileToBankedRAM("c0l1.bin", C0_L1_BANK, 0);
@@ -28,6 +40,21 @@ void loadCourses() {
 
     loadFileToBankedRAM("c15l0.bin", CFINISH_L0_BANK, 0);
     loadFileToBankedRAM("c15l1.bin", CFINISH_L1_BANK, 0);
+}
+
+unsigned char nextCourse(unsigned char courseCount, unsigned char selectedCourse, unsigned char *courseIndex) {
+    *courseIndex+=1;
+    if (*courseIndex == courseCount) {
+        return 15; // Finish line
+    }
+
+    switch(courseCount) {
+        case 2: return courseLayoutsMedium[selectedCourse][*courseIndex];
+        case 3: return courseLayoutsLong[selectedCourse][*courseIndex];
+        case 4: return courseLayoutsEpic[selectedCourse][*courseIndex];
+    }
+
+    return 0; // Shouldn't hit this
 }
 
 FlagTrackingList * drawCourseFlags(unsigned char course, unsigned char half, unsigned char gameMode) {

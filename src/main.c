@@ -175,8 +175,8 @@ void main() {
     unsigned char inSnow;
     unsigned short scrollSpeed, scrollLimit, totalTicks;
     unsigned char mins, secs, ticks, milli, missed, madeIt;
-    unsigned char course, selectedCourse = 0;
-    unsigned char runsUntilFinish, courseCount = 1;
+    unsigned char course, selectedCourse = 0, courseIndex;
+    unsigned char courseCount = 1;
     unsigned char flagNum;
     char save[MAPBASE_TILE_WIDTH*2];
 
@@ -203,6 +203,7 @@ void main() {
         spritesConfig(&guyData, 0, 0); // hide sprites
 
         // Pick the game and graphics mode and set the zoom level accordingly
+        courseIndex = 0;
         course = selectedCourse;
         pickModes(&zoomMode, &gameMode, &courseCount, &course);
         selectedCourse = course;
@@ -213,7 +214,6 @@ void main() {
         // Set the zoom level
         setZoom(zoomMode);
 
-        runsUntilFinish = courseCount; // How many courses until the finish line
         inSnow = 0;
 
         // Set scroll limits for the lo-res (320x240) graphics mode
@@ -408,15 +408,10 @@ void main() {
             if (scrollY >= 1024 && previousScroll < 1024) {
                 drawPartialCourse(course, 1, 1, gameMode);
             } else if (scrollY >= 3072 && previousScroll < 3072) {
-                runsUntilFinish--;
-                if (runsUntilFinish == 0) {
-                    course = 15;
+                course = nextCourse(courseCount, selectedCourse, &courseIndex);
+                if (course == 15) {
                     drawPartialCourse(course, 0, 0, gameMode);
                 } else {
-                    course++;
-                    if (course == COURSE_COUNT) {
-                        course = 0;
-                    }
                     flagsNext = drawPartialCourse(course, 0, 1, gameMode);
                 }
                 
