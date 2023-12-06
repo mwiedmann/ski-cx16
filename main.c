@@ -285,6 +285,7 @@ void main() {
                         
                         // Update all the timer segments from the new totalTicks
                         refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
+                        showTimer(mins, secs, milli, missed);
                         waitCount(120);
                     }
                 }
@@ -355,13 +356,27 @@ void main() {
             
             move(&guyData, scrollX, &scrollSpeed, inSnow);
 
-            // Dead if off screen
+            // Crash if off screen
             if (guyData.guyX > 640) {
-                finialTimerUpdate(ticks, &milli);
+                messageCenterSave("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode, save);
+                waitCount(120);
+                restoreRow(save, 7, 15, scrollY, zoomMode);
+
+                // Move to middle, back up, and find safe spot
+                guyData.guyX = 320;
+                getSafeSpot();
+                inSnow = 0;
+                scrollSpeed = 0;
+
+                // Move the player into positon
+                move(&guyData, scrollX, &scrollSpeed, inSnow);
+                setScroll();
+                totalTicks+= CRASH_PENALTY_TICKS;
+                
+                // Update all the timer segments from the new totalTicks
+                refreshTimerFromTicks(totalTicks, &mins, &secs, &ticks, &milli);
                 showTimer(mins, secs, milli, missed);
-                messageCenter("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode);
-                waitCount(180);
-                break;
+                waitCount(120);
             }
 
             // Only scroll on odd frames at slowest speed
