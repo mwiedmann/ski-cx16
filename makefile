@@ -2,7 +2,7 @@ CC=cl65
 
 make:
 	$(CC) --cpu 65C02 -Or -Cl -C cx16.cfg -o ./build/SKI.PRG -t cx16 \
-	src/main.c src/wait.c src/utils.c src/config.c src/course.c src/sprites.c src/scores.c src/sound.c src/zsmkit.lib
+	src/main.c src/wait.c src/utils.c src/config.c src/course.c src/sprites.c src/scores.c src/sound.c src/joy.c src/zsmkit.lib
 
 run:
 	cd build && \

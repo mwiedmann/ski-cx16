@@ -1,10 +1,12 @@
 #include <cx16.h>
 #include <joystick.h>
+#include <stdio.h>
 
 #include "config.h"
 #include "utils.h"
 #include "wait.h"
 #include "sound.h"
+#include "joy.h"
 
 void init() {
     char *tileFilename = "tilemap.bin";
@@ -89,16 +91,15 @@ void clearLayers() {
 }
 
 void showCourseRow(unsigned char courseCount, unsigned char thisCourse, unsigned char selectedCourse, unsigned char row) {
-    messageCenter(courseCount != thisCourse
-        ? " A   B   C   D "
-        : selectedCourse == 0
-            ? "-A-  B   C   D "
-            : selectedCourse == 1
-                ? " A  -B-  C   D "
-                : selectedCourse == 2
-                    ? " A   B  -C-  D "
-                    : " A   B   C  -D-",
-            row, row, 0, 0, 1);
+    char buf[40];
+
+    sprintf(buf, "%s %s %s %s",
+        selectedCourse == 0 ? "-A-" : " A ",
+        selectedCourse == 1 ? "-B-" : " B ",
+        selectedCourse == 2 ? "-C-" : " C ",
+        selectedCourse == 3 ? "-D-" : " D ");
+
+    messageCenter(courseCount != thisCourse ? " A   B   C   D " : buf, row, row, 0, 0, 1);
 }
 
 void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount, unsigned char *course) {
@@ -122,17 +123,11 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
                 *zoomMode = 0;
             }
 
-            while(JOY_UP(joy) || JOY_DOWN(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
             break;
         }
 
@@ -153,23 +148,27 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     while (1) {
         joy = joy_read(0);
 
-        if (JOY_UP(joy) || JOY_DOWN(joy)) {
+        if (JOY_UP(joy)) {
+            if (*gameMode == 0) {
+                *gameMode = 2;
+            } else {
+                *gameMode-=1;
+            }
+
+            waitForRelease();
+        }
+
+        if (JOY_DOWN(joy)) {
             *gameMode+=1;
             if (*gameMode == 3) {
                 *gameMode = 0;
             }
 
-            while(JOY_UP(joy) || JOY_DOWN(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
             break;
         }
 
@@ -205,10 +204,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
                 *courseCount = 1;
             }
 
-            while(JOY_DOWN(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_UP(joy)) {
@@ -217,10 +213,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
                 *courseCount = 4;
             }
 
-            while(JOY_UP(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_LEFT(joy)) {
@@ -230,10 +223,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
                 *course-=1;
             }
 
-            while(JOY_LEFT(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_RIGHT(joy)) {
@@ -243,17 +233,11 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
                 *course+=1;
             }
 
-            while(JOY_RIGHT(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
         }
 
         if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
+            waitForRelease();
             break;
         }
 
@@ -273,20 +257,4 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     }
 
     showTitleBackground();
-}
-
-void waitForButtonPress() {
-    unsigned char joy;
-
-    while(1) {
-        joy = joy_read(0);
-
-        if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-            while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
-                wait();
-                joy = joy_read(0);
-            }
-            break;
-        }
-    }
 }
