@@ -15,6 +15,7 @@ void loadFileToVRAM(char *filename, unsigned long addr);
 void loadFileToBankedRAM(char *filename, unsigned char bank, unsigned short addr);
 void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, unsigned long length);
 void restoreRow(char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode);
+unsigned short getTextTile(char c);
 void message(char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY);
 void messageSave(char* msg, unsigned char row, unsigned char col, unsigned short scrollX, unsigned short scrollY, char* save);
 void messageCenter(char* msg, unsigned char row0, unsigned char row1, unsigned short scrollX, unsigned short scrollY, unsigned short zoomMode);

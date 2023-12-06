@@ -79,6 +79,33 @@ void copyBankedRAMToVRAM(unsigned char startMemBank, unsigned long vramAddr, uns
     }
 }
 
+unsigned short getTextTile(char c) {
+    // "0123456789:ABCXYZ!#$%+-=."
+    // We could reorganize the tile image to have the characters in PETSCII order
+    // but this is fine for now
+    return (unsigned short)(c >= '0' && c <= ':'
+            ? TILE_CHARS_START + (c-'0') // Numbers and :
+            : c >= 'A' && c<= 'Z'
+                ? TILE_CHARS_START + 12 + (c-'A') // Letters
+                : c == '!'
+                    ? TILE_CHARS_START + 38
+                    : c == '#'
+                        ? TILE_CHARS_START + 39
+                        : c == '$'
+                            ? TILE_CHARS_START + 40
+                            : c == '%'
+                                ? TILE_CHARS_START + 41
+                                : c == '+'
+                                    ? TILE_CHARS_START + 42
+                                    : c == '-'
+                                        ? TILE_CHARS_START + 43
+                                        : c == '='
+                                            ? TILE_CHARS_START + 46
+                                            : c == '.'
+                                                ? TILE_CHARS_START + 47
+                                                : 0);
+}
+
 void restoreRow(char* save, unsigned char row0, unsigned char row1, unsigned short scrollY, unsigned short zoomMode) {
     unsigned short i;
     unsigned char row = zoomMode == 0 ? row0 : row1;
@@ -132,30 +159,7 @@ void messageSave(char* msg, unsigned char row, unsigned char col, unsigned short
             break;
         }
 
-        // "0123456789:ABCXYZ!#$%+-=."
-        // We could reorganize the tile image to have the characters in PETSCII order
-        // but this is fine for now
-        tile =  msg[i] >= '0' && msg[i]<= ':'
-            ? TILE_CHARS_START + (msg[i]-'0') // Numbers and :
-            : msg[i] >= 'A' && msg[i]<= 'Z'
-                ? TILE_CHARS_START + 12 + (msg[i]-'A') // Letters
-                : msg[i] == '!'
-                    ? TILE_CHARS_START + 38
-                    : msg[i] == '#'
-                        ? TILE_CHARS_START + 39
-                        : msg[i] == '$'
-                            ? TILE_CHARS_START + 40
-                            : msg[i] == '%'
-                                ? TILE_CHARS_START + 41
-                                : msg[i] == '+'
-                                    ? TILE_CHARS_START + 42
-                                    : msg[i] == '-'
-                                        ? TILE_CHARS_START + 43
-                                        : msg[i] == '='
-                                            ? TILE_CHARS_START + 46
-                                            : msg[i] == '.'
-                                                ? TILE_CHARS_START + 47
-                                                : 0;
+        tile = getTextTile(msg[i]);
 
         VERA.data0 = tile;
         VERA.data0 = 0;

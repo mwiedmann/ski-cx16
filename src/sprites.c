@@ -3,6 +3,7 @@
 
 #include "sprites.h"
 #include "config.h"
+#include "utils.h"
 
 // While trying to turn left/right, how many frames before the X move changes
 #define FRAMES_PER_GUY_TURN 8
@@ -26,30 +27,7 @@ void spriteText(char* msg, unsigned char row) {
         // Set the Increment Mode, turn on bit 4
         VERA.address_hi |= 0b10000;
         
-        // "0123456789:ABCXYZ!#$%+-=."
-        // We could reorganize the tile image to have the characters in PETSCII order
-        // but this is fine for now
-        tile =  msg[i] >= '0' && msg[i]<= ':'
-            ? TILE_CHARS_START + (msg[i]-'0') // Numbers and :
-            : msg[i] >= 'A' && msg[i]<= 'Z'
-                ? TILE_CHARS_START + 12 + (msg[i]-'A') // Letters
-                : msg[i] == '!'
-                    ? TILE_CHARS_START + 38
-                    : msg[i] == '#'
-                        ? TILE_CHARS_START + 39
-                        : msg[i] == '$'
-                            ? TILE_CHARS_START + 40
-                            : msg[i] == '%'
-                                ? TILE_CHARS_START + 41
-                                : msg[i] == '+'
-                                    ? TILE_CHARS_START + 42
-                                    : msg[i] == '-'
-                                        ? TILE_CHARS_START + 43
-                                        : msg[i] == '='
-                                            ? TILE_CHARS_START + 46
-                                            : msg[i] == '.'
-                                                ? TILE_CHARS_START + 47
-                                                : 0;
+        tile = getTextTile(msg[i]);
 
         VERA.data0 = (TILEBASE_ADDR + (tile * 256))>>5;
         VERA.data0 = 0b10000000 | (TILEBASE_ADDR + (tile * 256))>>13;
