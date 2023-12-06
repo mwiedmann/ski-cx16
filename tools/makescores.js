@@ -15,8 +15,4 @@ const bytes = vals.map(v => ([shortLo(v.score), shortHi(v.score), v.name.charCod
 
 let output = new Uint8Array([0,0,...bytes]);
 
-for (let count=1; count<=4; count++) {
-    for (let mode=0; mode<=1; mode++) {
-        fs.writeFileSync(`SCORE${mode}${count}.BIN`, output, "binary");
-    }
-}
+fs.writeFileSync(`build/SCORE.BIN`, output, "binary");

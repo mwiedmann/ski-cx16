@@ -1,10 +1,10 @@
 const fs = require("fs");
 
 const filebase = process.argv[2];
-const imageName = `${filebase}.data`
-const palName = `${filebase}.data.pal`
-const palOutputFilename = `${filebase.toUpperCase()}.PAL`
-const imageOutputFilename = `${filebase.toUpperCase()}.BIN`
+const imageName = `gfx/${filebase}.data`
+const palName = `gfx/${filebase}.data.pal`
+const palOutputFilename = `build/${filebase.toUpperCase()}.PAL`
+const imageOutputFilename = `build/${filebase.toUpperCase()}.BIN`
 
 console.log(
   `imageName: ${imageName} palName ${palName}`

@@ -4,7 +4,7 @@ The bin file is formatted for the C data structs so they can be malloc'd and loa
 */
 const fs = require("fs");
 
-const rawText = fs.readFileSync("../gfx/ski.ldtk");
+const rawText = fs.readFileSync("gfx/ski.ldtk");
 const d = JSON.parse(rawText);
 
 const tileWidth = 40;
@@ -113,7 +113,7 @@ const createLevelCode = (levelNum, level) => {
         outputFilename = `C${levelNum}L${layerNum}.BIN`;
         output = new Uint8Array(bytes);
       }
-      fs.writeFileSync(`../build/${outputFilename}`, output, "binary");
+      fs.writeFileSync(`build/${outputFilename}`, output, "binary");
     }
   });
 };

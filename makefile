@@ -1,19 +1,21 @@
 CC=cl65
 
 make:
-	$(CC) --cpu 65C02 -Or -Cl -C cx16.cfg -o SKI.PRG -t cx16 main.c wait.c utils.c config.c course.c sprites.c scores.c sound.c zsmkit.lib
+	$(CC) --cpu 65C02 -Or -Cl -C cx16.cfg -o ./build/SKI.PRG -t cx16 \
+	src/main.c src/wait.c src/utils.c src/config.c src/course.c src/sprites.c src/scores.c src/sound.c src/zsmkit.lib
 
 run:
-	x16emur46/x16emu -prg SKI.PRG -run
+	cd build && \
+	../x16emur46/x16emu -prg SKI.PRG -run
 
 ldtk:
-	node ldtk-convert.js
+	node tools/ldtk-convert.js
 
 gimp:
-	node gimp-convert.js tilemap
+	node tools/gimp-convert.js tilemap
 
 score:
-	node makescores.js
+	node tools/makescores.js
 
 zip:
 	zip ski.zip SKI.PRG \
