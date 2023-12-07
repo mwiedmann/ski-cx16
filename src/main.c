@@ -12,6 +12,7 @@
 #include "sprites.h"
 #include "scores.h"
 #include "sound.h"
+#include "joy.h"
 
 #define MISSED_FLAG_PENALTY_TICKS 300
 #define CRASH_PENALTY_TICKS 600
@@ -169,10 +170,40 @@ void refreshTimerFromTicks(unsigned short totalTicks, unsigned char *mins, unsig
     *milli = (totalTicks*100)/60;
 }
 
+unsigned char checkQuit(unsigned char joy) {
+    char save1[MAPBASE_TILE_WIDTH*2], save2[MAPBASE_TILE_WIDTH*2];
+    unsigned char joy2, result;
+
+    if (JOY_SELECT(joy)) {
+        messageCenterSave("SELECT-SHFT TO QUIT", 7, 14, scrollX, scrollY, zoomMode, save1);
+        messageCenterSave("START-RET TO RESUME", 8, 15, scrollX, scrollY, zoomMode, save2);
+
+        waitForRelease();
+
+        while(1) {
+            joy2 = joy_read(0);
+            if (JOY_SELECT(joy2)) {
+                waitForRelease();
+                result = 1;
+                break;
+            } else if (JOY_START(joy2)) {
+                waitForRelease();
+                result = 0;
+                break;
+            }
+
+            wait();
+        }
+
+        restoreRow(save1, 7, 14, scrollY, zoomMode);
+        restoreRow(save2, 7, 15, scrollY, zoomMode);
+
+        return result;
+    }
+}
+
 void main() {
-    unsigned char l0Tile;
-    unsigned char l1Tile;
-    unsigned char inSnow;
+    unsigned char l0Tile, l1Tile, inSnow, joy;
     unsigned short scrollSpeed, scrollLimit, totalTicks;
     unsigned char mins, secs, ticks, milli, missed, madeIt;
     unsigned char course, selectedCourse = 0, courseIndex;
@@ -243,13 +274,20 @@ void main() {
         flagsCurrent = drawPartialCourse(course, 0, 1, gameMode);
 
         // Move the player into positon
-        move(&guyData, scrollX, &scrollSpeed, inSnow);
+        move(&guyData, scrollX, &scrollSpeed, inSnow, 0);
         
         // Show the GET READY...GO...
         startingMessage(zoomMode);
 
         // Main game loop
         while(1) {
+            joy = joy_read(0);
+
+            // Player can pause and quit the game
+            if (checkQuit(joy)) {
+                break;
+            }
+
             // Get the tiles on each layer the guy is currently touching
             getCollisionTiles(&l0Tile, &l1Tile);
 
@@ -279,7 +317,7 @@ void main() {
                         scrollSpeed = 0;
 
                         // Move the player into positon
-                        move(&guyData, scrollX, &scrollSpeed, inSnow);
+                        move(&guyData, scrollX, &scrollSpeed, inSnow, 0);
                         setScroll();
                         totalTicks+= CRASH_PENALTY_TICKS;
                         
@@ -354,7 +392,7 @@ void main() {
                 }
             }
             
-            move(&guyData, scrollX, &scrollSpeed, inSnow);
+            move(&guyData, scrollX, &scrollSpeed, inSnow, joy);
 
             // Crash if off screen
             if (guyData.guyX > 640) {
@@ -369,7 +407,7 @@ void main() {
                 scrollSpeed = 0;
 
                 // Move the player into positon
-                move(&guyData, scrollX, &scrollSpeed, inSnow);
+                move(&guyData, scrollX, &scrollSpeed, inSnow, 0);
                 setScroll();
                 totalTicks+= CRASH_PENALTY_TICKS;
                 

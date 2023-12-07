@@ -25,6 +25,6 @@ void moveSprite(unsigned long spriteAddr, unsigned short x, unsigned short y);
 void shadowSprite(GuyData *guyData, unsigned char show);
 void spritesConfig(GuyData *guyData, unsigned char zoomMode, unsigned char show);
 void spriteText(char* msg, unsigned char row);
-void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow);
+void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow, unsigned char joy);
 
 #endif

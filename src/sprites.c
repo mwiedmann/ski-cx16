@@ -130,8 +130,7 @@ void moveSprite(unsigned long spriteAddr, unsigned short x, unsigned short y) {
     VERA.data0 = y>>8;
 }
 
-void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow) {
-    unsigned char joy;
+void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned char inSnow, unsigned char joy) {
     unsigned short scrollInc = 0, scrollMax;
     short moveMax;
 
@@ -145,8 +144,6 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
 
     if (!guyData->jumping) {
         moveMax = inSnow ? GUY_MOVE_X_SNOW_MAX : GUY_MOVE_X_MAX;
-
-        joy = joy_read(0);
 
         // While holding L/R to turn guy, track how many frames the player holds L/R
         // We don't want to turn them more until FRAMES_PER_GUY_TURN have past
