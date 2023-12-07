@@ -1,4 +1,5 @@
 CC=cl65
+EMU=../x16emur46/x16emu
 
 make:
 	$(CC) --cpu 65C02 -Or -Cl -C cx16.cfg -o ./build/SKI.PRG -t cx16 \
@@ -6,7 +7,7 @@ make:
 
 run:
 	cd build && \
-	../x16emur46/x16emu -prg SKI.PRG -run
+	$(EMU) -prg SKI.PRG -run
 
 ldtk:
 	node tools/ldtk-convert.js
