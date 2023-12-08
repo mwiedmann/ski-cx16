@@ -217,12 +217,11 @@ void main() {
     showTitle();
 
     loadCourses();
-    // sound_loadMusic(1);
-    // waitCount(60); // Song stutters if we don't wait
+    soundLoadMusic(SOUND_MUSIC_TITLE);
+    waitCount(120); // Song stutters if we don't wait
 
-    // sound_playMusic(1);
-    // waitCount(60);
-  
+    soundPlayMusic(SOUND_MUSIC_TITLE);
+    
     while(1) {
         // Reset scrolling
         scrollY = 0;

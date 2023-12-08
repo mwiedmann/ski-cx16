@@ -38,7 +38,7 @@ void init() {
     loadFileToVRAM(palFilename, PALETTE_ADDR);
     loadFileToVRAM(tileFilename, TILEBASE_ADDR);
 
-    sound_init();
+    soundInit();
 }
 
 void setZoom(unsigned char zoomMode) {

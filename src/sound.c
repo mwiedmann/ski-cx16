@@ -17,7 +17,7 @@ unsigned char loadedMusic = SOUND_MUSIC_NONE;
 
 char * musicNames[] = {
 	"",
-	"forest.zsm"
+	"title.zsm"
 };
 
 void loadSound(char* name, unsigned char index) {
@@ -27,7 +27,7 @@ void loadSound(char* name, unsigned char index) {
 }
 
 
-void sound_init() {
+void soundInit() {
 	unsigned char i=0;
 	asm volatile ("lda #%b", ZSM_BANK);
 	asm volatile ("jsr zsm_init_engine");
@@ -49,7 +49,7 @@ void sound_init() {
 
 unsigned char sound_tmp, param1, param2;
 
-void sound_playSFX(unsigned char effect, unsigned char priority) {
+void soundPlaySFX(unsigned char effect, unsigned char priority) {
 	BANK_NUM = SFX_BANK_1;
 
 	param1 = sfxAddressHigh[effect];
@@ -69,13 +69,13 @@ void sound_playSFX(unsigned char effect, unsigned char priority) {
 	// SET_RAM_BANK(level_currentLevelBank);
 }
 
-void sound_stopChannel(unsigned char priority) {
+void soundStopChannel(unsigned char priority) {
 	param2 = priority;
 	asm volatile ("ldx %v", param2);
 	asm volatile ("jsr zsm_stop");
 }
 
-void sound_anticipateMusic(unsigned char music) {
+void soundAnticipateMusic(unsigned char music) {
 	if (music != currentMusic) {
 		param2 = SOUND_PRIORITY_MUSIC;
 
@@ -84,7 +84,7 @@ void sound_anticipateMusic(unsigned char music) {
 	}
 }
 
-void sound_loadMusic(unsigned char music) {
+void soundLoadMusic(unsigned char music) {
 	param2 = SOUND_PRIORITY_MUSIC;
 
 	asm volatile ("ldx %v", param2);
@@ -98,7 +98,7 @@ void sound_loadMusic(unsigned char music) {
 	loadedMusic = music;
 }
 
-void sound_playMusic(unsigned char music) {
+void soundPlayMusic(unsigned char music) {
 	if (music == currentMusic) return;
 
 	currentMusic = music;
@@ -111,7 +111,7 @@ void sound_playMusic(unsigned char music) {
 
 	if (!music) return;
 
-	if (loadedMusic != music) sound_loadMusic(music);
+	if (loadedMusic != music) soundLoadMusic(music);
 
 	BANK_NUM = MUSIC_BANK_START;
 

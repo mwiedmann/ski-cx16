@@ -6,13 +6,14 @@
 #define SOUND_PRIORITY_ACTION 2
 
 #define SOUND_MUSIC_NONE 0
+#define SOUND_MUSIC_TITLE 1
 
-extern void sound_init();
-extern void sound_playSFX(unsigned char effect, unsigned char priority) ;
-extern void sound_stopChannel(unsigned char priority);
+extern void soundInit();
+extern void soundPlaySFX(unsigned char effect, unsigned char priority) ;
+extern void soundStopChannel(unsigned char priority);
 
-extern void sound_loadMusic(unsigned char music);
-extern void sound_playMusic(unsigned char music);
-extern void sound_anticipateMusic(unsigned char music); //mutes current music if new music is different
+extern void soundLoadMusic(unsigned char music);
+extern void soundPlayMusic(unsigned char music);
+extern void soundAnticipateMusic(unsigned char music); //mutes current music if new music is different
 
 #endif
