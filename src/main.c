@@ -217,9 +217,6 @@ void main() {
     showTitle();
 
     loadCourses();
-    soundLoadMusic(SOUND_MUSIC_TITLE);
-    waitCount(120); // Song stutters if we don't wait
-
     soundPlayMusic(SOUND_MUSIC_TITLE);
     
     while(1) {
