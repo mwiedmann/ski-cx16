@@ -120,11 +120,7 @@ void showTitle() {
     // Requires 640 mode
     setZoom(1);
 
-    showTitleBackground();
-
-    messageCenter("WELCOME TO SKIING", 6, 13, scrollX, scrollY, 1);
-    messageCenter("BY MARK WIEDMANN", 7, 14, scrollX, scrollY, 1);
-    messageCenter("LOADING COURSES...", 9, 16, scrollX, scrollY, 1);
+    showTitleScreen();
 }
 
 void setScroll() {
@@ -215,10 +211,16 @@ void main() {
 
     init();
     showTitle();
-
+    messageCenter("LOADING...", 20, 20, 0, 0, 1);
     loadCourses();
+    soundLoadMusic(SOUND_MUSIC_TITLE);
+    waitCount(60); // Need this pause or the music stutters for some reason
     soundPlayMusic(SOUND_MUSIC_TITLE);
-    
+
+    messageCenter("PRESS A BUTTON", 20, 20, 0, 0, 1);
+    messageCenter("TO START", 21, 21, 0, 0, 1);
+    waitForButtonPress();
+
     while(1) {
         // Reset scrolling
         scrollY = 0;
@@ -236,7 +238,7 @@ void main() {
         selectedCourse = course;
         
         // Show the high scores for this mode
-        displayScores(zoomMode, gameMode, courseCount, selectedCourse, scrollX, scrollY, 65535U);
+        displayScores(gameMode, courseCount, selectedCourse, scrollX, scrollY, 65535U);
 
         // Set the zoom level
         setZoom(zoomMode);
@@ -520,6 +522,8 @@ void main() {
         setScroll();
         clearLayers();
         spritesConfig(&guyData, 0, 0); // hide sprites
-        displayScores(zoomMode, gameMode, courseCount, selectedCourse, scrollX, scrollY, madeIt ? totalTicks : 65535U);
+        // Set the zoom level
+        setZoom(1);
+        displayScores(gameMode, courseCount, selectedCourse, scrollX, scrollY, madeIt ? totalTicks : 65535U);
     }
 }

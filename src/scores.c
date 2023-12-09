@@ -10,7 +10,7 @@
 
 #define KEY_DELAY 10
 
-void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char courseCount, unsigned char startingCourse,
+void displayScores(unsigned char gameMode, unsigned char courseCount, unsigned char startingCourse,
     unsigned short scrollX, unsigned short scrollY, unsigned short newTicks) {
     unsigned short mins, secs, milli, ticks, mem=0;
     signed char b, i;
@@ -59,8 +59,8 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
                     ? "C"
                     : "D");
 
-    messageCenter(buf, 0, 6, scrollX, scrollY, zoomMode);
-    messageCenter("HIGH SCORES", 1, 7, scrollX, scrollY, zoomMode);
+    messageCenter(buf, 0, 6, scrollX, scrollY, 1);
+    messageCenter("HIGH SCORES", 1, 7, scrollX, scrollY, 1);
 
     while (!nameDone) {
         for (i=0; i<10; i++) {
@@ -89,12 +89,12 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
 
             sprintf(buf, "%u:%02u.%02u %s", mins, secs, milli, scoreList.scores[i].name);
 
-            messageCenter(buf, i+3, i+9, scrollX, scrollY, zoomMode);    
+            messageCenter(buf, i+3, i+9, scrollX, scrollY, 1);    
         }
 
         if (scoreRow != 99 && nameCount < 3) {
-            messageCenter("ENTER YOUR NAME", 13, 20, scrollX, scrollY, zoomMode);
-            messageCenter("WITH JOYSTICK", 14, 21, scrollX, scrollY, zoomMode);
+            messageCenter("ENTER YOUR NAME", 13, 20, scrollX, scrollY, 1);
+            messageCenter("WITH JOYSTICK", 14, 21, scrollX, scrollY, 1);
 
             joy = joy_read(0);
 
@@ -150,8 +150,8 @@ void displayScores(unsigned char zoomMode, unsigned char gameMode, unsigned char
         cbm_k_save((unsigned short)scoreList.scores, ((unsigned short)scoreList.scores) + (sizeof(Score) * scoreList.length));
     }
 
-    messageCenter(" PRESS A BUTTON ", 13, 20, scrollX, scrollY, zoomMode);
-    messageCenter(" TO CONTINUE ", 14, 21, scrollX, scrollY, zoomMode);
+    messageCenter(" PRESS A BUTTON ", 13, 20, scrollX, scrollY, 1);
+    messageCenter(" TO CONTINUE ", 14, 21, scrollX, scrollY, 1);
 
     waitForButtonPress();
 }

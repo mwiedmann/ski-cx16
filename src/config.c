@@ -38,6 +38,12 @@ void init() {
     loadFileToVRAM(palFilename, PALETTE_ADDR);
     loadFileToVRAM(tileFilename, TILEBASE_ADDR);
 
+    loadFileToBankedRAM("c16l0.bin", TITLE_SCREEN_BANK_0, 0);
+    loadFileToBankedRAM("c16l1.bin", TITLE_SCREEN_BANK_1, 0);
+
+    loadFileToBankedRAM("c17l0.bin", INST_SCREEN_BANK_0, 0);
+    loadFileToBankedRAM("c17l1.bin", INST_SCREEN_BANK_1, 0);
+    
     soundInit();
 }
 
@@ -80,14 +86,19 @@ void clearLayer1() {
     }
 }
 
+void showTitleScreen() {
+    loadFileToVRAM("c18l0.bin", L0_MAPBASE_ADDR);
+    loadFileToVRAM("c18l1.bin", L1_MAPBASE_ADDR);
+}
+
 void showTitleBackground() {
-    loadFileToVRAM("c16l0.bin", L0_MAPBASE_ADDR);
-    loadFileToVRAM("c16l1.bin", L1_MAPBASE_ADDR); 
+    copyBankedRAMToVRAM(TITLE_SCREEN_BANK_0, L0_MAPBASE_ADDR, 4096);
+    copyBankedRAMToVRAM(TITLE_SCREEN_BANK_1, L1_MAPBASE_ADDR, 4096);
 }
 
 void showInstructionsBackground() {
-    loadFileToVRAM("c17l0.bin", L0_MAPBASE_ADDR);
-    loadFileToVRAM("c17l1.bin", L1_MAPBASE_ADDR); 
+    copyBankedRAMToVRAM(INST_SCREEN_BANK_0, L0_MAPBASE_ADDR, 4096);
+    copyBankedRAMToVRAM(INST_SCREEN_BANK_1, L1_MAPBASE_ADDR, 4096);
 }
 
 void clearLayers() {

@@ -41,8 +41,13 @@
 #define CFINISH_L0_BANK C3_L1_BANK + COURSE_LAYER_BANK_SIZE // 36
 #define CFINISH_L1_BANK CFINISH_L0_BANK + COURSE_LAYER_BANK_SIZE // 40
 
-#define SFX_BANK_1 CFINISH_L1_BANK + COURSE_LAYER_BANK_SIZE // 44
-#define MUSIC_BANK_START SFX_BANK_1 + 1 // 45
+#define TITLE_SCREEN_BANK_0 CFINISH_L1_BANK + 1 // 41
+#define TITLE_SCREEN_BANK_1 TITLE_SCREEN_BANK_0 + 1 // 42
+#define INST_SCREEN_BANK_0 TITLE_SCREEN_BANK_1 + 1 // 43
+#define INST_SCREEN_BANK_1 INST_SCREEN_BANK_0 + 1 // 44
+
+#define SFX_BANK_1 INST_SCREEN_BANK_1 + 1 // 45
+#define MUSIC_BANK_START SFX_BANK_1 + 1 // 46
 
 #define SCORE_BANK 63
 
@@ -52,6 +57,7 @@
 
 void init();
 void setZoom(unsigned char zoomMode);
+void showTitleScreen();
 void showTitleBackground();
 void clearLayers();
 void clearLayer0();
