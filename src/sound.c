@@ -17,7 +17,8 @@ unsigned char loadedMusic = SOUND_MUSIC_NONE;
 
 char * musicNames[] = {
 	"",
-	"title.zsm"
+	"title.zsm",
+	"finish.zsm"
 };
 
 void loadSound(char* name, unsigned char index) {

@@ -437,10 +437,11 @@ void main() {
                     soundPlaySFX(2, 1);
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
+                    soundPlayMusic(SOUND_MUSIC_FINISH);
                     messageCenter("FINISHED!!!", 7, 15, scrollX, scrollY, zoomMode);
                     madeIt = 1;
                 }
-                waitCount(180);
+                waitCount(300);
                 break;
             }
 
@@ -528,6 +529,7 @@ void main() {
         spritesConfig(&guyData, 0, 0); // hide sprites
         // Set the zoom level
         setZoom(1);
+        soundPlayMusic(SOUND_MUSIC_TITLE);
         displayScores(gameMode, courseCount, selectedCourse, scrollX, scrollY, madeIt ? totalTicks : 65535U);
     }
 }

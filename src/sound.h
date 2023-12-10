@@ -7,6 +7,7 @@
 
 #define SOUND_MUSIC_NONE 0
 #define SOUND_MUSIC_TITLE 1
+#define SOUND_MUSIC_FINISH 2
 
 extern void soundInit();
 extern void soundPlaySFX(unsigned char effect, unsigned char priority) ;
