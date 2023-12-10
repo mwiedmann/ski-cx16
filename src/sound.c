@@ -10,7 +10,7 @@
 
 #include <cbm.h>
 
-unsigned char sfxAddressHigh[] = {0xa0,0xa2};
+unsigned char sfxAddressHigh[] = {0xa0, 0xa2, 0xa4};
 
 unsigned char currentMusic = SOUND_MUSIC_NONE;
 unsigned char loadedMusic = SOUND_MUSIC_NONE;
@@ -37,6 +37,7 @@ void soundInit() {
 
 	loadSound("spray.zsm", 0);
 	loadSound("woo.zsm", 1);
+	loadSound("crash.zsm", 2);
 }
 
 unsigned char sound_tmp, param1, param2;

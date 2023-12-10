@@ -306,6 +306,7 @@ void main() {
                     
                         // We will move the player to a safe space to continue
                         // Show ouch msg and restore tiles
+                        soundPlaySFX(2, 1);
                         messageCenterSave("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode, save);
                         waitCount(120);
                         restoreRow(save, 7, 15, scrollY, zoomMode);
@@ -395,6 +396,7 @@ void main() {
 
             // Crash if off screen
             if (guyData.guyX > 640) {
+                soundPlaySFX(2, 1);
                 messageCenterSave("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode, save);
                 waitCount(120);
                 restoreRow(save, 7, 15, scrollY, zoomMode);
@@ -432,6 +434,7 @@ void main() {
                 finialTimerUpdate(ticks, &milli);
                 showTimer(mins, secs, milli, missed);
                 if (guyData.guyX<240 || guyData.guyX > 400) {
+                    soundPlaySFX(2, 1);
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
                     messageCenter("FINISHED!!!", 7, 15, scrollX, scrollY, zoomMode);
