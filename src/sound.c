@@ -10,7 +10,7 @@
 
 #include <cbm.h>
 
-unsigned char sfxAddressHigh[] = {0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6};
+unsigned char sfxAddressHigh[] = {0xa0,0xa2};
 
 unsigned char currentMusic = SOUND_MUSIC_NONE;
 unsigned char loadedMusic = SOUND_MUSIC_NONE;
@@ -33,23 +33,16 @@ void soundInit() {
 	asm volatile ("jsr zsm_init_engine");
 	asm volatile ("jsr zsmkit_setisr");
 
+	BANK_NUM = SFX_BANK_1;
 
-	// SET_RAM_BANK(SFX_BANK_1);
-
-	// loadSound("hit.zsm", 0);
-	// loadSound("sword.zsm", 1);
-	// loadSound("swordhit.zsm", 2);
-	// loadSound("stairs.zsm", 3);
-	// loadSound("magiccast.zsm", 4);
-	// loadSound("magicattack.zsm", 5);
-	// loadSound("boop.zsm", 6);
-
-	// SET_RAM_BANK(level_currentLevelBank);
+	loadSound("spray.zsm", 0);
+	loadSound("woo.zsm", 1);
 }
 
 unsigned char sound_tmp, param1, param2;
 
 void soundPlaySFX(unsigned char effect, unsigned char priority) {
+	unsigned char prevBank = BANK_NUM;
 	BANK_NUM = SFX_BANK_1;
 
 	param1 = sfxAddressHigh[effect];
@@ -63,10 +56,10 @@ void soundPlaySFX(unsigned char effect, unsigned char priority) {
 	asm volatile ("ldy %v", param1); //address hi to Y
 	asm volatile ("jsr zsm_setmem");
 
-
 	asm volatile ("ldx %v", param2);
 	asm volatile ("jsr zsm_play");
-	// SET_RAM_BANK(level_currentLevelBank);
+
+	BANK_NUM = prevBank;
 }
 
 void soundStopChannel(unsigned char priority) {
@@ -124,15 +117,7 @@ void soundPlayMusic(unsigned char music) {
 	asm volatile ("ldx %v", param2);
 	asm volatile ("jsr zsm_play");
 
-	// if (music == SOUND_MUSIC_GAME_OVER || music == SOUND_MUSIC_DESCEND) {
-	// 	asm volatile ("ldx %v", param2); //music loops not
-	// 	asm volatile ("clc");
-	// 	asm volatile ("jsr zsm_setloop");
-	// } else {
-		asm volatile ("ldx %v", param2); //music loops
-		asm volatile ("sec");
-		asm volatile ("jsr zsm_setloop");
-	// }
-
-	// SET_RAM_BANK(level_currentLevelBank);
+	asm volatile ("ldx %v", param2); //music loops
+	asm volatile ("sec");
+	asm volatile ("jsr zsm_setloop");
 }

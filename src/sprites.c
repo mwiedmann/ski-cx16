@@ -4,6 +4,7 @@
 #include "sprites.h"
 #include "config.h"
 #include "utils.h"
+#include "sound.h"
 
 // While trying to turn left/right, how many frames before the X move changes
 #define FRAMES_PER_GUY_TURN 8
@@ -151,12 +152,14 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
             if (pushDir != -1) {
                 pushDir = -1;
                 pushCount = 0;
+                soundPlaySFX(0, 1);
             }
             pushCount++;
         } else if (JOY_RIGHT(joy)) {
             if (pushDir != 1) {
                 pushDir = 1;
                 pushCount = 0;
+                soundPlaySFX(0, 1);
             }
             pushCount++;
         } else {

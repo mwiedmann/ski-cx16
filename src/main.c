@@ -294,6 +294,7 @@ void main() {
                     guyData.jumping = 1;
                     guyData.jumpCount = JUMP_COUNT;
                     shadowSprite(&guyData, 1);
+                    soundPlaySFX(1, 1);
                 }
 
                 // Check for collision with tree bases/stumps/bushes/poles
