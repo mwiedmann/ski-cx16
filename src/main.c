@@ -24,7 +24,7 @@
 GuyData guyData;
 
 short scrollY = 0, previousScroll = 0, scrollX = 0;
-unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 1, gameMode = 1;
+unsigned char lastTileX = 0, lastTileY = 0, zoomMode = 1, gameMode = 0;
 unsigned short halfScrollLimit;
 
 void getCollisionTiles(unsigned char *l0Tile, unsigned char *l1Tile) {
@@ -214,7 +214,7 @@ void main() {
     messageCenter("LOADING...", 20, 20, 0, 0, 1);
     loadCourses();
     soundLoadMusic(SOUND_MUSIC_TITLE);
-    waitCount(60); // Need this pause or the music stutters for some reason
+    waitCount(90); // Need this pause or the music stutters for some reason
     soundPlayMusic(SOUND_MUSIC_TITLE);
 
     messageCenter("PRESS A BUTTON", 20, 20, 0, 0, 1);

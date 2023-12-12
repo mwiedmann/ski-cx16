@@ -15,6 +15,11 @@ unsigned char sfxAddressHigh[] = {0xa0, 0xa2, 0xa4};
 unsigned char currentMusic = SOUND_MUSIC_NONE;
 unsigned char loadedMusic = SOUND_MUSIC_NONE;
 
+unsigned char musicOn = 1;
+unsigned char sfxOn = 1;
+
+unsigned char sound_tmp, param1, param2;
+
 char * musicNames[] = {
 	"",
 	"title.zsm",
@@ -41,10 +46,13 @@ void soundInit() {
 	loadSound("crash.zsm", 2);
 }
 
-unsigned char sound_tmp, param1, param2;
-
 void soundPlaySFX(unsigned char effect, unsigned char priority) {
 	unsigned char prevBank = BANK_NUM;
+
+	if (!sfxOn) {
+		return;
+	}
+
 	BANK_NUM = SFX_BANK_1;
 
 	param1 = sfxAddressHigh[effect];
@@ -65,6 +73,7 @@ void soundPlaySFX(unsigned char effect, unsigned char priority) {
 }
 
 void soundStopChannel(unsigned char priority) {
+	currentMusic = 0;
 	param2 = priority;
 	asm volatile ("ldx %v", param2);
 	asm volatile ("jsr zsm_stop");
@@ -94,7 +103,9 @@ void soundLoadMusic(unsigned char music) {
 }
 
 void soundPlayMusic(unsigned char music) {
-	if (music == currentMusic) return;
+	if (!musicOn || music == currentMusic) {
+		return;
+	}
 
 	currentMusic = music;
 
@@ -104,9 +115,13 @@ void soundPlayMusic(unsigned char music) {
 	asm volatile ("ldx %v", param2);
 	asm volatile ("jsr zsm_stop");
 
-	if (!music) return;
+	if (!music) {
+		return;
+	}
 
-	if (loadedMusic != music) soundLoadMusic(music);
+	if (loadedMusic != music) {
+		soundLoadMusic(music);
+	}
 
 	BANK_NUM = MUSIC_BANK_START;
 

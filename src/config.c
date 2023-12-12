@@ -8,6 +8,9 @@
 #include "sound.h"
 #include "joy.h"
 
+extern unsigned char musicOn;
+extern unsigned char sfxOn;
+
 void init() {
     char *tileFilename = "tilemap.bin";
     char *palFilename = "tilemap.pal";
@@ -119,7 +122,7 @@ void showCourseRow(unsigned char courseCount, unsigned char thisCourse, unsigned
 }
 
 void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *courseCount, unsigned char *course) {
-    unsigned char joy;
+    unsigned char joy, selection = 0;
 
     showTitleBackground();
     
@@ -127,16 +130,47 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     setZoom(1);
 
     // Pick graphics mode
-    messageCenter("CHOOSE GRAPHICS MODE", 5, 11, 0, 0, 1);
-    messageCenter("USE JOYSTICK TO SELECT", 6, 12, 0, 0, 1);
+    messageCenter("CHOOSE SETTINGS", 8, 8, 0, 0, 1);
+    messageCenter("JOYSTICK TO CHANGE", 9, 9, 0, 0, 1);
+    messageCenter("PRESS BUTTON TO CONTINUE", 10, 10, 0, 0, 1);
 
     while (1) {
         joy = joy_read(0);
 
         if (JOY_UP(joy) || JOY_DOWN(joy)) {
+            selection++;
+            if (selection == 3) {
+                selection = 0;
+            }
+
+            waitForRelease();
+        }
+
+        if (selection == 0 && (JOY_LEFT(joy) || JOY_RIGHT(joy))) {
             *zoomMode+=1;
             if (*zoomMode == 2) {
                 *zoomMode = 0;
+            }
+
+            waitForRelease();
+        }
+
+        if (selection == 1 && (JOY_LEFT(joy) || JOY_RIGHT(joy))) {
+            musicOn+=1;
+            if (musicOn == 2) {
+                musicOn = 0;
+                soundStopChannel(SOUND_PRIORITY_MUSIC);
+            } else {
+                soundPlayMusic(SOUND_MUSIC_TITLE);
+            }
+
+            waitForRelease();
+        }
+
+        if (selection == 2 && (JOY_LEFT(joy) || JOY_RIGHT(joy))) {
+            sfxOn+=1;
+            if (sfxOn == 2) {
+                sfxOn = 0;   
             }
 
             waitForRelease();
@@ -147,19 +181,32 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
             break;
         }
 
-        messageCenter((*zoomMode) == 0 ? "::320X240::" : "  320X240  ", 7, 14, 0, 0, 1);
-        messageCenter("ZOOMED IN ACTION FEEL", 8, 15, 0, 0, 1);
-        
-        messageCenter((*zoomMode) == 1 ? "::640X480::" : "  640X480  ", 10, 17, 0, 0, 1);
-        messageCenter("BIGGER FIELD OF VIEW", 11, 18, 0, 0, 1);
+        messageCenter(selection == 0 ? "::GRAPHICS MODE::" : "  GRAPHICS MODE  ", 13, 13, 0, 0, 1);
+        messageCenter((*zoomMode) == 0
+            ? "-320X240-  640X480 "
+            : " 320X240  -640X480-"
+            , 14, 14, 0, 0, 1);
+
+        messageCenter(selection == 1 ? "::MUSIC TOGGLE::" : "  MUSIC TOGGLE  ", 17, 17, 0, 0, 1);
+        messageCenter(musicOn == 1
+            ? "-ON-  OFF "
+            : " ON  -OFF-"
+            , 18, 18, 0, 0, 1);
+
+        messageCenter(selection == 2 ? "::SFX TOGGLE::" : "  SFX TOGGLE  ", 21, 21, 0, 0, 1);
+        messageCenter(sfxOn == 1
+            ? "-ON-  OFF "
+            : " ON  -OFF-"
+            , 22, 22, 0, 0, 1);
 
         wait();
     }
 
     // Pick game mode
     showTitleBackground();
-    messageCenter("CHOOSE GAME MODE", 5, 7, 0, 0, 1);
-    messageCenter("USE JOYSTICK TO SELECT", 6, 8, 0, 0, 1);
+    messageCenter("CHOOSE GAME MODE", 6, 6, 0, 0, 1);
+    messageCenter("USE JOYSTICK TO SELECT", 7, 7, 0, 0, 1);
+    messageCenter("PRESS BUTTON TO CONTINUE", 8, 8, 0, 0, 1);
 
     while (1) {
         joy = joy_read(0);
@@ -188,19 +235,19 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
             break;
         }
 
-        messageCenter((*gameMode) == GAME_MODE_FREE ? "::OPEN::" : "  OPEN  ", 7, 10, 0, 0, 1);
-        messageCenter("TIME ONLY", 8, 11, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_FREE ? "::OPEN::" : "  OPEN  ", 11, 11, 0, 0, 1);
+        messageCenter("TIME ONLY", 12, 12, 0, 0, 1);
 
-        messageCenter((*gameMode) == GAME_MODE_FLAGS ? "::FLAGS::" : "  FLAGS  ", 10, 13, 0, 0, 1);
-        messageCenter("SKI AROUND FLAGS", 11, 14, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_FLAGS ? "::FLAGS::" : "  FLAGS  ", 14, 14, 0, 0, 1);
+        messageCenter("SKI AROUND FLAGS", 15, 15, 0, 0, 1);
         
-        messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 13, 16, 0, 0, 1);
-        messageCenter("SKI BETWEEN GATES", 14, 17, 0, 0, 1);
+        messageCenter((*gameMode) == GAME_MODE_GATES ? "::GATES::" : "  GATES  ", 17, 17, 0, 0, 1);
+        messageCenter("SKI BETWEEN GATES", 18, 18, 0, 0, 1);
 
-        messageCenter("THERE IS A TIME", 16, 19, 0, 0, 1);
-        messageCenter("PENALTY FOR CRASHES", 17, 20, 0, 0, 1);
-        messageCenter("AND MISSING", 18, 21, 0, 0, 1);
-        messageCenter("FLAGS AND GATES", 19, 22, 0, 0, 1);
+        messageCenter("THERE IS A TIME", 20, 20, 0, 0, 1);
+        messageCenter("PENALTY FOR CRASHES", 21, 21, 0, 0, 1);
+        messageCenter("AND MISSING", 22, 22, 0, 0, 1);
+        messageCenter("FLAGS AND GATES", 23, 23, 0, 0, 1);
 
         wait();
     }
@@ -257,17 +304,17 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
             break;
         }
 
-        messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 11, 11, 0, 0, 1);
-        showCourseRow(*courseCount, 1, *course, 12);
+        messageCenter((*courseCount) == 1 ? "::SHORT::" : "  SHORT  ", 12, 12, 0, 0, 1);
+        showCourseRow(*courseCount, 1, *course, 13);
 
-        messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 14, 14, 0, 0, 1);
-        showCourseRow(*courseCount, 2, *course, 15);
+        messageCenter((*courseCount) == 2 ? "::MEDIUM::" : "  MEDIUM  ", 15, 15, 0, 0, 1);
+        showCourseRow(*courseCount, 2, *course, 16);
         
-        messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 17, 17, 0, 0, 1);
-        showCourseRow(*courseCount, 3, *course, 18);
+        messageCenter((*courseCount) == 3 ? "::LONG::" : "  LONG  ", 18, 18, 0, 0, 1);
+        showCourseRow(*courseCount, 3, *course, 19);
 
-        messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 20, 20, 0, 0, 1);
-        showCourseRow(*courseCount, 4, *course, 21);
+        messageCenter((*courseCount) == 4 ? "::EPIC::" : "  EPIC  ", 21, 21, 0, 0, 1);
+        showCourseRow(*courseCount, 4, *course, 22);
 
         wait();
     }

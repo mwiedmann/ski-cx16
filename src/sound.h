@@ -9,12 +9,12 @@
 #define SOUND_MUSIC_TITLE 1
 #define SOUND_MUSIC_FINISH 2
 
-extern void soundInit();
-extern void soundPlaySFX(unsigned char effect, unsigned char priority) ;
-extern void soundStopChannel(unsigned char priority);
+void soundInit();
+void soundPlaySFX(unsigned char effect, unsigned char priority) ;
+void soundStopChannel(unsigned char priority);
 
-extern void soundLoadMusic(unsigned char music);
-extern void soundPlayMusic(unsigned char music);
-extern void soundAnticipateMusic(unsigned char music); //mutes current music if new music is different
+void soundLoadMusic(unsigned char music);
+void soundPlayMusic(unsigned char music);
+void soundAnticipateMusic(unsigned char music); //mutes current music if new music is different
 
 #endif
