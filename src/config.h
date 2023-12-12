@@ -12,7 +12,7 @@
 #define TILEBASE_ADDR L1_MAPBASE_ADDR + MAPBASE_SIZE
 
 #define TILE_CHARS_START 97
-#define TILESET_SIZE 37120L // (12w * 12h * 16x16pixels) + 1 empty 16x16 tile
+#define TILESET_SIZE 46336 // (12w * 15h * 16x16pixels) + 1 empty 16x16 tile
 #define TILESET_DIGITS_ADDR TILEBASE_ADDR + (TILE_CHARS_START * 256)
 
 #define PALETTE_ADDR 0x1FA00L

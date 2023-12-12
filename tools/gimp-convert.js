@@ -28,7 +28,7 @@ const flattenedTiles = [];
 const frameWidth = 16
 const frameHeight = 16
 const xTiles = 12
-const yTiles = 12
+const yTiles = 15
 
 let ty, tx, y, x, start, pixelIdx;
 
