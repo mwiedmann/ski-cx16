@@ -23,7 +23,8 @@ unsigned char sound_tmp, param1, param2;
 char * musicNames[] = {
 	"",
 	"title.zsm",
-	"finish.zsm"
+	"finish.zsm",
+	"chill.zsm"
 };
 
 void loadSound(char* name, unsigned char index) {

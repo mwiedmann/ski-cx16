@@ -240,6 +240,8 @@ void main() {
         // Show the high scores for this mode
         displayScores(gameMode, courseCount, selectedCourse, scrollX, scrollY, 65535U);
 
+        soundPlayMusic(SOUND_MUSIC_CHILL);
+        
         // Set the zoom level
         setZoom(zoomMode);
 
