@@ -24,7 +24,7 @@ char * musicNames[] = {
 	"",
 	"title.zsm",
 	"finish.zsm",
-	"chill.zsm"
+	"blues.zsm"
 };
 
 void loadSound(char* name, unsigned char index) {
