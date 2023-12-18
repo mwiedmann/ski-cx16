@@ -152,14 +152,14 @@ void move(GuyData *guyData, short scrollX, unsigned short *scrollSpeed, unsigned
             if (pushDir != -1) {
                 pushDir = -1;
                 pushCount = 0;
-                soundPlaySFX(0, 1);
+                soundPlaySFX(SOUND_SFX_SPRAY, 1);
             }
             pushCount++;
         } else if (JOY_RIGHT(joy)) {
             if (pushDir != 1) {
                 pushDir = 1;
                 pushCount = 0;
-                soundPlaySFX(0, 1);
+                soundPlaySFX(SOUND_SFX_SPRAY, 1);
             }
             pushCount++;
         } else {

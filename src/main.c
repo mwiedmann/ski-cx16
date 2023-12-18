@@ -212,6 +212,8 @@ void main() {
     init();
     showTitle();
     messageCenter("LOADING...", 20, 20, 0, 0, 1);
+    message("VERSION 1.0", 28, 28, 0, 0);
+
     loadCourses();
     soundLoadMusic(SOUND_MUSIC_TITLE);
     waitCount(90); // Need this pause or the music stutters for some reason
@@ -241,7 +243,7 @@ void main() {
         displayScores(gameMode, courseCount, selectedCourse, scrollX, scrollY, 65535U);
 
         soundPlayMusic(SOUND_MUSIC_CHILL);
-        
+
         // Set the zoom level
         setZoom(zoomMode);
 
@@ -296,7 +298,7 @@ void main() {
                     guyData.jumping = 1;
                     guyData.jumpCount = JUMP_COUNT;
                     shadowSprite(&guyData, 1);
-                    soundPlaySFX(1, 1);
+                    soundPlaySFX(SOUND_SFX_WOO, 1);
                 }
 
                 // Check for collision with tree bases/stumps/bushes/poles
@@ -308,7 +310,7 @@ void main() {
                     
                         // We will move the player to a safe space to continue
                         // Show ouch msg and restore tiles
-                        soundPlaySFX(2, 1);
+                        soundPlaySFX(SOUND_SFX_CRASH, 1);
                         messageCenterSave("OUCH!!!", 7, 15, scrollX, scrollY, zoomMode, save);
                         waitCount(120);
                         restoreRow(save, 7, 15, scrollY, zoomMode);
@@ -350,6 +352,7 @@ void main() {
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                     } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                        soundPlaySFX(SOUND_SFX_NO, 1);
                         message("MISSED", 3, flagsCurrent->trackingData[flagNum].data.col1, 0, scrollY);
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
@@ -363,6 +366,7 @@ void main() {
                         (flagsCurrent->trackingData[flagNum].data.tile1 == RED_FLAG && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX <= (flagsCurrent->trackingData[flagNum].data.col1)) ||
                         (flagsCurrent->trackingData[flagNum].data.tile1 == BLUE_FLAG && lastTileY == (flagsCurrent->trackingData[flagNum].data.row) && lastTileX >= (flagsCurrent->trackingData[flagNum].data.col1))
                         ) {
+                        soundPlaySFX(SOUND_SFX_YES, 1);
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                     }
@@ -374,6 +378,7 @@ void main() {
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                     } else if (lastTileY > (flagsCurrent->trackingData[flagNum].data.row)) {
+                        soundPlaySFX(SOUND_SFX_NO, 1);
                         message("MISSED", 3, flagsCurrent->trackingData[flagNum].data.col2, 0, scrollY);
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
@@ -388,6 +393,7 @@ void main() {
                          lastTileX >= flagsCurrent->trackingData[flagNum].data.col1 &&
                          lastTileX <= flagsCurrent->trackingData[flagNum].data.col2)
                         ) {
+                        soundPlaySFX(SOUND_SFX_YES, 1);
                         flagsCurrent->trackingData[flagNum].tracked = 1;
                         flagNum++;
                     }
@@ -398,7 +404,7 @@ void main() {
 
             // Crash if off screen
             if (guyData.guyX > 640) {
-                soundPlaySFX(2, 1);
+                soundPlaySFX(SOUND_SFX_CRASH, 1);
                 messageCenterSave("STAY ON COURSE!!!", 7, 15, scrollX, scrollY, zoomMode, save);
                 waitCount(120);
                 restoreRow(save, 7, 15, scrollY, zoomMode);
@@ -436,7 +442,7 @@ void main() {
                 finialTimerUpdate(ticks, &milli);
                 showTimer(mins, secs, milli, missed);
                 if (guyData.guyX<240 || guyData.guyX > 400) {
-                    soundPlaySFX(2, 1);
+                    soundPlaySFX(SOUND_SFX_CRASH, 1);
                     messageCenter("OH NO, MISSED!!!", 7, 15, scrollX, scrollY, zoomMode);
                 } else {
                     soundPlayMusic(SOUND_MUSIC_FINISH);

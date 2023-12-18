@@ -10,6 +10,12 @@
 #define SOUND_MUSIC_FINISH 2
 #define SOUND_MUSIC_CHILL 3
 
+#define SOUND_SFX_SPRAY 0
+#define SOUND_SFX_WOO 1
+#define SOUND_SFX_CRASH 2
+#define SOUND_SFX_YES 3
+#define SOUND_SFX_NO 4
+
 void soundInit();
 void soundPlaySFX(unsigned char effect, unsigned char priority) ;
 void soundStopChannel(unsigned char priority);

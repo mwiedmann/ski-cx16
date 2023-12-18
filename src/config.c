@@ -183,8 +183,8 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
 
         messageCenter(selection == 0 ? "::GRAPHICS MODE::" : "  GRAPHICS MODE  ", 13, 13, 0, 0, 1);
         messageCenter((*zoomMode) == 0
-            ? "-320X240-  640X480 "
-            : " 320X240  -640X480-"
+            ? "-320X240 ZOOMED-  640X480 FULL "
+            : " 320X240 ZOOMED  -640X480 FULL-"
             , 14, 14, 0, 0, 1);
 
         messageCenter(selection == 1 ? "::MUSIC TOGGLE::" : "  MUSIC TOGGLE  ", 17, 17, 0, 0, 1);
