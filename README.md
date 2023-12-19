@@ -51,5 +51,10 @@ Now convert the `.data` file into a `.bin` file useable in Mini-Ski.
 
 In the `makefile` there is a command `make gimp` to do this.
 
+## Additional Credits
+For sound/music I use the awesome ZSMKit by MooingLemur which licensed under an MIT license (https://github.com/mooinglemur/zsmkit).
+
+ZSMKit is mainly designed to be used in Assembly, so to use ZSMKit in C, I borrowed some code and the cx16.cfg from Toboter's amazing game [Vault of the Vindicator](https://codeberg.org/Toboter/VaultOfTheVindicator).
+
 ## License
 See the [license file](./license.md)
