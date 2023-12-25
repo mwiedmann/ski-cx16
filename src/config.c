@@ -131,7 +131,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
 
     messageCenter("CONTROLS", 9, 9, 0, 0, 1);
 
-    messageCenter("USE L-R CURSOR KEYS", 11, 11, 0, 0, 1);
+    messageCenter("USE CURSOR KEYS", 11, 11, 0, 0, 1);
     messageCenter("OR JOYSTICK 1", 12, 12, 0, 0, 1);
     messageCenter("TO CONTROL SKIER", 13, 13, 0, 0, 1);
     messageCenter("AND MENUS", 14, 14, 0, 0, 1);

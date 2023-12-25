@@ -56,5 +56,7 @@ For sound/music I use the awesome ZSMKit by MooingLemur which licensed under an 
 
 ZSMKit is mainly designed to be used in Assembly, so to use ZSMKit in C, I borrowed some code and the cx16.cfg from Toboter's amazing game [Vault of the Vindicator](https://codeberg.org/Toboter/VaultOfTheVindicator).
 
+The "Tiny Ski (1.0)" graphics are created/distributed by Kenney (www.kenney.nl).
+
 ## License
 See the [license file](./license.md)

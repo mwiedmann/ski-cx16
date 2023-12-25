@@ -212,6 +212,8 @@ void main() {
     init();
     showTitle();
     messageCenter("LOADING...", 20, 20, 0, 0, 1);
+    message("GFX BY KENNY", 27, 1, 0, 0);
+    message("WWW.KENNY.NL", 28, 1, 0, 0);
     message("VERSION 1.2", 28, 28, 0, 0);
 
     loadCourses();
