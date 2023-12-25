@@ -177,7 +177,7 @@ unsigned char checkQuit(unsigned char joy) {
         waitForRelease();
 
         while(1) {
-            joy2 = joy_read(0);
+            joy2 = joy_read(0) | joy_read(1);
             if (JOY_SELECT(joy2)) {
                 waitForRelease();
                 result = 1;
@@ -212,14 +212,14 @@ void main() {
     init();
     showTitle();
     messageCenter("LOADING...", 20, 20, 0, 0, 1);
-    message("VERSION 1.0", 28, 28, 0, 0);
+    message("VERSION 1.2", 28, 28, 0, 0);
 
     loadCourses();
     soundLoadMusic(SOUND_MUSIC_TITLE);
     waitCount(90); // Need this pause or the music stutters for some reason
     soundPlayMusic(SOUND_MUSIC_TITLE);
 
-    messageCenter("PRESS A BUTTON", 20, 20, 0, 0, 1);
+    messageCenter("PRESS Z OR BUTTON", 20, 20, 0, 0, 1);
     messageCenter("TO START", 21, 21, 0, 0, 1);
     waitForButtonPress();
 
@@ -283,7 +283,7 @@ void main() {
 
         // Main game loop
         while(1) {
-            joy = joy_read(0);
+            joy = joy_read(0) | joy_read(1);
 
             // Player can pause and quit the game
             if (checkQuit(joy)) {

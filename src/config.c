@@ -129,15 +129,44 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     // Requires 640 mode
     setZoom(1);
 
+    messageCenter("CONTROLS", 9, 9, 0, 0, 1);
+
+    messageCenter("USE L-R CURSOR KEYS", 11, 11, 0, 0, 1);
+    messageCenter("OR JOYSTICK 1", 12, 12, 0, 0, 1);
+    messageCenter("TO CONTROL SKIER", 13, 13, 0, 0, 1);
+    messageCenter("AND MENUS", 14, 14, 0, 0, 1);
+
+    messageCenter("PRESS Z OR", 16, 16, 0, 0, 1);
+    messageCenter("JOYSTICK BUTTON", 17, 17, 0, 0, 1);
+    messageCenter("TO SELECT", 18, 18, 0, 0, 1);
+
+    messageCenter("SHIFT OR SELECT", 20, 20, 0, 0, 1);
+    messageCenter("WILL PAUSE GAME", 21, 21, 0, 0, 1);
+
+    messageCenter("PRESS BUTTON TO CONTINUE", 24, 22, 0, 0, 1);
+
+    waitForButtonPress();
+
+    showTitleBackground();
     // Pick graphics mode
     messageCenter("CHOOSE SETTINGS", 8, 8, 0, 0, 1);
     messageCenter("JOYSTICK TO CHANGE", 9, 9, 0, 0, 1);
     messageCenter("PRESS BUTTON TO CONTINUE", 10, 10, 0, 0, 1);
 
     while (1) {
-        joy = joy_read(0);
+        joy = joy_read(0) | joy_read(1);
 
-        if (JOY_UP(joy) || JOY_DOWN(joy)) {
+        if (JOY_UP(joy)) {
+            if (selection ==0) {
+                selection = 2;
+            } else {
+                selection--;
+            }
+
+            waitForRelease();
+        }
+
+         if (JOY_DOWN(joy)) {
             selection++;
             if (selection == 3) {
                 selection = 0;
@@ -209,7 +238,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     messageCenter("PRESS BUTTON TO CONTINUE", 8, 8, 0, 0, 1);
 
     while (1) {
-        joy = joy_read(0);
+        joy = joy_read(0) | joy_read(1);
 
         if (JOY_UP(joy)) {
             if (*gameMode == 0) {
@@ -259,7 +288,7 @@ void pickModes(unsigned char *zoomMode, unsigned char *gameMode, unsigned char *
     messageCenter("LEFT-RIGHT FOR COURSE", 9, 9, 0, 0, 1);
 
     while (1) {
-        joy = joy_read(0);
+        joy = joy_read(0) | joy_read(1);
 
         if (JOY_DOWN(joy)) {
             *courseCount+=1;

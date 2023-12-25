@@ -96,7 +96,7 @@ void displayScores(unsigned char gameMode, unsigned char courseCount, unsigned c
             messageCenter("ENTER YOUR NAME", 13, 20, scrollX, scrollY, 1);
             messageCenter("WITH JOYSTICK", 14, 21, scrollX, scrollY, 1);
 
-            joy = joy_read(0);
+            joy = joy_read(0) | joy_read(1);
 
             if (JOY_DOWN(joy)) {
                 nameChar++;
@@ -113,7 +113,7 @@ void displayScores(unsigned char gameMode, unsigned char courseCount, unsigned c
             } else if (JOY_LEFT(joy) && nameCount > 0) {
                 while(JOY_LEFT(joy)) {
                     wait();
-                    joy = joy_read(0);
+                    joy = joy_read(0) | joy_read(1);
                 }
                 scoreList.scores[scoreRow].name[nameCount] = '-';
                 nameCount--;
@@ -121,7 +121,7 @@ void displayScores(unsigned char gameMode, unsigned char courseCount, unsigned c
             } else if (JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
                 while(JOY_BTN_1(joy) || JOY_BTN_2(joy)) {
                     wait();
-                    joy = joy_read(0);
+                    joy = joy_read(0) | joy_read(1);
                 }
                 nameCount++;
             }
